@@ -80,3 +80,24 @@
   - Query system iterates entities (O(n) per query)
   - Sufficient for current scale (<1000 entities)
   - Can migrate to bitECS later if performance becomes critical
+
+## ADR-008: 128m Chunk Size for Terrain
+
+- **Date:** P5
+- **Status:** Accepted
+- **Context:** Need to choose chunk size for procedural terrain generation. Balances memory usage, generation time, LOD transitions, and view distance.
+- **Decision:** 128m chunks with 4 LOD levels (128, 64, 32, 16 resolution).
+- **Justification:**
+  - **Memory**: 128×128 heightmap = 16KB (Float32Array). Acceptable for hundreds of chunks.
+  - **Generation time**: ~5-10ms per chunk in worker. Fast enough for streaming.
+  - **LOD transitions**: 128m provides good granularity for 4 LOD levels.
+  - **View distance**: 800m = ~6 chunks radius. Manageable memory footprint.
+- **Alternatives considered:**
+  - 64m: Too many chunks, overhead dominates
+  - 256m: Too coarse, LOD transitions too jarring
+  - 512m: Generation too slow, memory spikes
+- **Consequences:**
+  - Chunk loading/unloading every ~128m of camera movement
+  - LOD switching at 200m, 400m, 800m, 1600m distances
+  - Zero-copy typed array transfer from worker (heights, normals, biomes)
+  - Shared heightAt(x,z) API works across all LOD levels

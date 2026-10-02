@@ -18,3 +18,6 @@ export * from './debug/index.js';
 
 // Render module
 export * from './render/index.js';
+
+// Terrain module
+export * from './terrain/index.js';

@@ -13,7 +13,7 @@
 ## Rendering (P6–P9)
 
 - [ ] **P6** — Camera system (perspective, ortho, controls)
-- [ ] **P7** — Procedural terrain generation (worker)
+- [x] **P7** — Procedural terrain generation (worker) ✅
 - [ ] **P8** — Advanced lighting (directional, ambient, shadows)
 - [ ] **P9** — Post-processing pipeline (bloom, tonemap)
 
