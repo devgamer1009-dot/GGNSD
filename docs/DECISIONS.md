@@ -61,3 +61,22 @@
   - No `EffectComposer` — use `RenderPipeline` for post-processing
   - Async initialization required before first render
   - One codebase covers both WebGPU and WebGL2
+
+## ADR-007: Custom Minimal ECS Instead of bitECS
+
+- **Date:** P4
+- **Status:** Accepted
+- **Context:** bitECS 0.4 API is complex with TypeScript strict mode. The new API uses `registerComponent`, `query`, and typed component references that don't integrate cleanly with strict TypeScript.
+- **Decision:** Implement a custom minimal ECS with class-based components and a simple World API.
+- **Trade-offs:**
+  - ✅ Full TypeScript support with strict mode
+  - ✅ Simple, debuggable API
+  - ✅ Easy to extend and modify
+  - ❌ Less performance than bitECS (not using SoA/bitmasks)
+  - ❌ Fewer advanced features (no automatic query caching)
+- **Consequences:**
+  - Components are classes that implement `Component` interface
+  - World manages entities and components with Maps
+  - Query system iterates entities (O(n) per query)
+  - Sufficient for current scale (<1000 entities)
+  - Can migrate to bitECS later if performance becomes critical

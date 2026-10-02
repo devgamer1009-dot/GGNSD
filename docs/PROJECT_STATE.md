@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P3 — Renderer + Benchmark** ✅ COMPLETE
+**P4 — Engine Core** ✅ COMPLETE
 
 ## What Exists
 
@@ -13,13 +13,22 @@
 - `npm run check` = typecheck + lint + test + build
 - Layer structure: engine, game, content, ui, workers, debug
 - Layer enforcement: dependency-cruiser + ESLint restricted imports
-- Docs: ARCHITECTURE, CONVENTIONS, PERFORMANCE, DECISIONS, ROADMAP, ENVIRONMENT
+- Docs: ARCHITECTURE, CONVENTIONS, PERFORMANCE, DECISIONS, ROADMAP, ENVIRONMENT, ENGINE
 - Design Bible: WORLD.md, GAMEPLAY.md, CONTENT_PLAN.md (all <150 lines)
 - **Renderer (P3):** Three.js r186 WebGPURenderer with WebGL2 fallback
 - **Capability detection:** GPU adapter info, backend detection
 - **Debug overlay (F3):** FPS, frame ms, 1% low, draw calls, triangles, backend, GPU
 - **Benchmark page:** `/bench.html` with stress test (1k→200k instances + particles)
-- Boot screen: 3D cube with "boot OK" + backend info
+- **Engine Core (P4):**
+  - Math library: Vec2, Vec3, Mat4 with object pools
+  - Custom ECS: Entity, Component, World with query system
+  - Event bus: Pub/sub system for decoupled communication
+  - Input system: Keyboard, mouse, gamepad with named actions
+  - Seeded RNG: Deterministic random number generation
+  - Transform hierarchy: Parent-child relationships with world/local matrices
+  - Game loop: Fixed timestep (60Hz) with render interpolation
+  - Debug console: In-game command line (` key)
+- Test scene: Controllable cube with WASD movement, camera follow, ECS integration
 
 ## What Is Verified
 
