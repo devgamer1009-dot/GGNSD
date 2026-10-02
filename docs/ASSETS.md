@@ -9,6 +9,16 @@
 - **No images used.** Boot screen uses procedural canvas rendering (starfield).
 - All visuals are code-generated (CSS, Canvas 2D API).
 
+### P2 — Design Bible
+
+- **No images used.** Design docs only.
+
+### P3 — Renderer + Benchmark
+
+- **No images used.** All 3D rendering is procedural (Three.js).
+- Benchmark page uses CDN-loaded Three.js (no local assets).
+- All visuals: code-generated (WebGPU/WebGL2 shaders, geometry, materials).
+
 ## License Policy
 
 - Default: procedural art (code, SVG, Canvas, shaders)

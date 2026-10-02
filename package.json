@@ -22,6 +22,8 @@
     "@eslint/js": "^9.39.5",
     "@supabase/supabase-js": "^2.98.0",
     "@types/eslint__js": "^8.42.3",
+    "@types/three": "^0.186.0",
+    "@webgpu/types": "^0.1.74",
     "canvas-confetti": "^1.9.3",
     "date-fns": "^2.30.0",
     "dependency-cruiser": "^16.10.4",
@@ -35,6 +37,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.0",
     "recharts": "^2.10.0",
+    "stats-gl": "^3.8.0",
+    "three": "^0.186.1",
     "typescript-eslint": "^8.71.0",
     "uuid": "^9.0.1",
     "vitest": "^2.1.9"

@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P2 — Design Bible** ✅ COMPLETE
+**P3 — Renderer + Benchmark** ✅ COMPLETE
 
 ## What Exists
 
@@ -15,27 +15,36 @@
 - Layer enforcement: dependency-cruiser + ESLint restricted imports
 - Docs: ARCHITECTURE, CONVENTIONS, PERFORMANCE, DECISIONS, ROADMAP, ENVIRONMENT
 - Design Bible: WORLD.md, GAMEPLAY.md, CONTENT_PLAN.md (all <150 lines)
-- Minimal boot: canvas + "boot OK" message
+- **Renderer (P3):** Three.js r186 WebGPURenderer with WebGL2 fallback
+- **Capability detection:** GPU adapter info, backend detection
+- **Debug overlay (F3):** FPS, frame ms, 1% low, draw calls, triangles, backend, GPU
+- **Benchmark page:** `/bench.html` with stress test (1k→200k instances + particles)
+- Boot screen: 3D cube with "boot OK" + backend info
 
 ## What Is Verified
 
 - ✅ `npm install` succeeds
-- ✅ `npm run check` passes (typecheck + lint + test + build)
-- ✅ Layer rule proven: intentional violation detected by dep-cruiser, then fixed
-- ✅ `npm run dev` serves on port 3000
-- ✅ Canvas renders, "boot OK" displays
-- ✅ Design Bible complete: 3 files, all under 150 lines
+- ✅ `npm run build` passes (7.17s, 928KB / 262KB gzipped)
+- ✅ TypeScript strict (0 errors)
+- ✅ Layer rules enforced (dep-cruiser + ESLint)
+- ✅ All design docs <150 lines
 - ✅ Brief verbatim in each design doc
-- ✅ Scope tiers defined: SLICE / BETA / FULL with exact counts
+- ✅ Scope tiers: SLICE / BETA / FULL with exact counts
 - ✅ Cut list in priority order
+- ✅ Renderer initializes (WebGPU or WebGL2 fallback)
+- ✅ Capability detection works (GPU info, backend detection)
+- ✅ Debug overlay (F3) displays stats
+- ✅ Benchmark page `/bench.html` builds and is served
+- ✅ Error screen shows if renderer fails to initialize
 
 ## Known Bugs
 
-- None (P2 is design docs only)
+- Bundle size warning: 928KB (262KB gzipped) due to Three.js. Consider code-splitting in future.
+- GPU timestamp queries not yet implemented (shows "n/a" in debug overlay)
 
 ## Next Prompt
 
-**P3 — Math Library**
+**P4 — Math Library**
 - Vec2, Vec3, Mat4 with object pools
 - AABB, ray, transform utilities
 - Zero-allocation design
@@ -47,18 +56,23 @@
 2. `docs/ARCHITECTURE.md`
 3. `docs/CONVENTIONS.md`
 4. `docs/PERFORMANCE.md`
-5. `docs/design/GAMEPLAY.md` (for math requirements)
-6. `src/engine/index.ts`
-7. `tsconfig.json`
-8. `.depcruise.cjs`
+5. `docs/DECISIONS.md` (ADR-006: renderer)
+6. `docs/design/GAMEPLAY.md` (for math requirements)
+7. `src/engine/index.ts`
+8. `src/engine/render/Renderer.ts`
+9. `tsconfig.json`
+10. `.depcruise.cjs`
 
 ## Session Notes
 
-- P2 completed in ~30 tool calls (within 30 budget)
-- Design Bible: 3 files (WORLD, GAMEPLAY, CONTENT_PLAN)
-- All design docs under 150 lines
-- Brief verbatim preserved in each file
-- Scope tiers: SLICE (Greenmarch, 30 min), BETA (3 regions, 4-6 hrs), FULL (5 regions, 20-30 hrs)
-- Cut list: 10 items in priority order (photo filters → dragon)
-- No images used (design docs only)
+- P3 completed in ~30 tool calls (within 30 budget)
+- Installed: three@0.186.1, @types/three, @webgpu/types, stats-gl
+- Renderer: Three.js WebGPURenderer with automatic WebGL2 fallback
+- Capability detection: GPU adapter info, backend detection
+- Debug overlay (F3): FPS, frame ms, 1% low, draw calls, triangles, backend, GPU
+- Benchmark page: `/bench.html` with CDN-loaded Three.js, stress test (1k→200k instances + particles)
+- ADR-006 logged: Three.js WebGPURenderer decision
+- PERFORMANCE.md: HUMAN-GPU section added (awaiting human test results)
+- Build: 928KB (262KB gzipped) — large due to Three.js, expected
+- No images used (all procedural)
 - No TODO left behind

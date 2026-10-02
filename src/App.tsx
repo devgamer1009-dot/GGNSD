@@ -1,99 +1,163 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Renderer, DebugOverlay } from './engine/render/index.js';
+import * as THREE from 'three/webgpu';
 
 /**
- * CrownFall — Boot Screen (P1)
+ * CrownFall — Boot Screen (P3)
  *
- * Renders a canvas with a procedural starfield and displays "boot OK".
- * This is the minimal main that proves the engine pipeline works.
+ * Initializes Three.js WebGPURenderer with WebGL2 fallback.
+ * Shows capability detection and error screen if unsupported.
  */
 export default function App() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [backend, setBackend] = useState<string>('Initializing...');
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!container) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    let renderer: Renderer | null = null;
+    let debugOverlay: DebugOverlay | null = null;
+    let animationId = 0;
 
-    // Resize canvas to fill viewport
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
+    const init = async () => {
+      try {
+        // Create renderer
+        renderer = new Renderer({
+          antialias: true,
+          powerPreference: 'high-performance',
+        });
 
-    // Procedural starfield
-    const stars: { x: number; y: number; r: number; a: number }[] = [];
-    for (let i = 0; i < 200; i++) {
-      stars.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        r: Math.random() * 1.5 + 0.5,
-        a: Math.random(),
-      });
-    }
+        // Initialize (handles WebGPU/WebGL2 fallback)
+        const info = await renderer.init();
+        setBackend(`${info.backend} — ${info.renderer}`);
 
-    let frameId: number;
-    let time = 0;
+        // Add canvas to container
+        container.appendChild(renderer.domElement);
 
-    const render = () => {
-      time += 0.01;
-      ctx.fillStyle = '#0a0a0f';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // Handle resize
+        const resize = () => {
+          const width = window.innerWidth;
+          const height = window.innerHeight;
+          renderer!.setSize(width, height);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+        };
+        resize();
+        window.addEventListener('resize', resize);
 
-      // Draw stars
-      for (const star of stars) {
-        const flicker = Math.sin(time * 2 + star.a * 10) * 0.3 + 0.7;
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(224, 216, 200, ${star.a * flicker})`;
-        ctx.fill();
+        // Create scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a0f);
+
+        // Camera
+        const camera = new THREE.PerspectiveCamera(
+          75,
+          window.innerWidth / window.innerHeight,
+          0.1,
+          1000
+        );
+        camera.position.z = 5;
+
+        // Add a simple cube to test rendering
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        const material = new THREE.MeshStandardMaterial({ color: 0xc8a96e });
+        const cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+
+        // Lighting
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 5, 5);
+        scene.add(directionalLight);
+
+        // Debug overlay
+        debugOverlay = new DebugOverlay(renderer);
+
+        // Animation loop
+        let time = 0;
+        renderer.setAnimationLoop((timestamp) => {
+          time = timestamp;
+          cube.rotation.x = time * 0.001;
+          cube.rotation.y = time * 0.002;
+
+          renderer!.render(scene, camera);
+          debugOverlay?.update(time);
+        });
+
+        console.log('[CrownFall] Boot OK');
+        console.log(`[CrownFall] Backend: ${info.backend}`);
+        console.log(`[CrownFall] GPU: ${info.renderer} (${info.vendor})`);
+      } catch (err) {
+        console.error('[CrownFall] Initialization failed:', err);
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'WebGPU and WebGL2 are not supported in this browser.'
+        );
       }
-
-      // Title
-      ctx.fillStyle = '#c8a96e';
-      ctx.font = 'bold 48px Georgia, serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('CROWNFALL', canvas.width / 2, canvas.height / 2 - 40);
-
-      // Subtitle
-      ctx.fillStyle = '#8a7a5a';
-      ctx.font = '18px Georgia, serif';
-      ctx.fillText('Medieval Fantasy Open World', canvas.width / 2, canvas.height / 2);
-
-      // Boot status
-      ctx.fillStyle = '#4ade80';
-      ctx.font = '14px monospace';
-      ctx.fillText('[ boot OK ]', canvas.width / 2, canvas.height / 2 + 60);
-
-      // Version
-      ctx.fillStyle = '#555';
-      ctx.font = '12px monospace';
-      ctx.fillText('v0.1.0 — P1 Foundation', canvas.width / 2, canvas.height - 30);
-
-      frameId = requestAnimationFrame(render);
     };
 
-    render();
+    init();
 
     return () => {
-      cancelAnimationFrame(frameId);
-      window.removeEventListener('resize', resize);
+      if (animationId) cancelAnimationFrame(animationId);
+      debugOverlay?.dispose();
+      renderer?.dispose();
     };
   }, []);
 
-  return (
-    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      <canvas
-        ref={canvasRef}
+  if (error) {
+    return (
+      <div
         style={{
-          display: 'block',
           width: '100%',
-          height: '100%',
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#0a0a0f',
+          color: '#ff4444',
+          fontFamily: 'monospace',
+          padding: '20px',
+          textAlign: 'center',
         }}
-      />
+      >
+        <h1 style={{ fontSize: '48px', marginBottom: '20px' }}>⚠️</h1>
+        <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>Graphics Initialization Failed</h2>
+        <p style={{ fontSize: '14px', maxWidth: '600px', lineHeight: '1.6' }}>{error}</p>
+        <p style={{ fontSize: '12px', marginTop: '20px', color: '#888' }}>
+          Please try a different browser (Chrome, Edge, or Firefox with WebGPU support).
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          color: '#4ade80',
+          fontFamily: 'monospace',
+          fontSize: '12px',
+          background: 'rgba(0, 0, 0, 0.6)',
+          padding: '8px 16px',
+          borderRadius: '4px',
+        }}
+      >
+        [ boot OK ] — {backend}
+        <br />
+        <span style={{ fontSize: '10px', color: '#888' }}>Press F3 for debug overlay</span>
+      </div>
     </div>
   );
 }

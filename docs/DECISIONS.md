@@ -41,3 +41,23 @@
 - **Context:** No backend. Need persistent storage for game saves.
 - **Decision:** IndexedDB via a save-system in engine layer. Never localStorage for game data.
 - **Consequences:** Async API. Must use worker for large saves to avoid main-thread blocking.
+
+## ADR-006: Three.js WebGPURenderer with WebGL2 Fallback
+
+- **Date:** P3
+- **Status:** Accepted
+- **Context:** Need a modern 3D renderer with WebGPU + TSL support and automatic WebGL2 fallback.
+- **Decision:** Three.js r186 `WebGPURenderer` from `three/webgpu`. Automatic WebGL2 backend fallback.
+- **Docs:** https://threejs.org/docs/pages/WebGPURenderer.html, https://www.utsubo.com/blog/webgpu-threejs-migration-guide
+- **Key facts:**
+  - Import: `import * as THREE from 'three/webgpu'`
+  - TSL: `import { ... } from 'three/tsl'`
+  - Init: `await renderer.init()` or `setAnimationLoop()`
+  - Backend detection: `renderer.backend.isWebGPUBackend` (after init)
+  - Force WebGL2: `new WebGPURenderer({ forceWebGL: true })`
+  - Timestamp queries: `timestamp-query` feature (WebGPU) or `EXT_disjoint_timer_query_webgl2` (WebGL2)
+- **Consequences:**
+  - No `ShaderMaterial` / `onBeforeCompile` — must use TSL node materials
+  - No `EffectComposer` — use `RenderPipeline` for post-processing
+  - Async initialization required before first render
+  - One codebase covers both WebGPU and WebGL2

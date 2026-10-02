@@ -137,7 +137,7 @@ If scope must shrink, cut in this order. **Never cut SLICE content.**
 ---
 
 ## Milestones
-SLICE → P12 (Greenmarch) · BETA → P20 (3 regions) · FULL → P24 (all regions)
+SLICE → P13 (Greenmarch) · BETA → P21 (3 regions) · FULL → P25 (all regions)
 
 ## Success Criteria
 **SLICE:** 30 min playtest, all 5 quests finishable, boss fair, 60 fps.

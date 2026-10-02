@@ -47,3 +47,30 @@ When reporting results, always state:
 - `Array.filter().map()` chains on large arrays per frame → use in-place loops
 - `JSON.stringify()` on main thread → use worker
 - `document.querySelector()` per frame → cache refs
+
+---
+
+## HUMAN-GPU Measurements
+
+> Paste benchmark results from `/bench.html` here. Format: one section per run.
+
+### Template
+
+```
+Run: [date]
+Hardware: [CPU, GPU, RAM]
+Browser: [name + version]
+Backend: [WebGPU | WebGL2]
+Adapter: [vendor, device, architecture]
+Build ID: [from bench output]
+
+| Step            | Instances | Particles | Avg FPS | Avg ms | 1% Low ms |
+| --------------- | --------- | --------- | ------- | ------ | --------- |
+| 1k instances    | 1,000     | 0         |         |        |           |
+| 10k instances   | 10,000    | 0         |         |        |           |
+| 50k instances   | 50,000    | 0         |         |        |           |
+| 200k instances  | 200,000   | 0         |         |        |           |
+| + particles     | 200,000   | 100,000   |         |        |           |
+```
+
+_Awaiting human test results._

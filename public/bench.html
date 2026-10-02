@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CrownFall Benchmark</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0f;
+      color: #e0d8c8;
+      font-family: 'Georgia', serif;
+      overflow: hidden;
+    }
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    #ui {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 8px;
+      z-index: 1000;
+      min-width: 300px;
+    }
+    h1 {
+      font-size: 24px;
+      color: #c8a96e;
+      margin-bottom: 10px;
+    }
+    .info {
+      font-size: 12px;
+      font-family: monospace;
+      margin: 5px 0;
+      color: #aaa;
+    }
+    button {
+      background: #c8a96e;
+      color: #0a0a0f;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    button:hover { background: #d4b87a; }
+    button:disabled { background: #555; cursor: not-allowed; }
+    #results {
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      max-height: 300px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      display: none;
+    }
+    .step-indicator {
+      font-size: 11px;
+      color: #4ade80;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="ui">
+    <h1>CrownFall Benchmark</h1>
+    <div class="info" id="backend-info">Backend: ...</div>
+    <div class="info" id="gpu-info">GPU: ...</div>
+    <div class="info" id="browser-info">Browser: ...</div>
+    <div class="step-indicator" id="step-indicator"></div>
+    <button id="run-btn">Run Tour (30s)</button>
+    <div id="results"></div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.webgpu.min.js",
+      "three/tsl": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.tsl.min.js"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    // State
+    let renderer, scene, camera;
+    let instancedMeshes = [];
+    let particles;
+    let frameTimes = [];
+    let benchmarkRunning = false;
+    let benchmarkStartTime = 0;
+
+    // UI elements
+    const backendInfo = document.getElementById('backend-info');
+    const gpuInfo = document.getElementById('gpu-info');
+    const browserInfo = document.getElementById('browser-info');
+    const stepIndicator = document.getElementById('step-indicator');
+    const runBtn = document.getElementById('run-btn');
+    const resultsDiv = document.getElementById('results');
+
+    // Browser info
+    browserInfo.textContent = `Browser: ${navigator.userAgent.split(' ').slice(-2).join(' ')}`;
+
+    // Initialize
+    async function init() {
+      const container = document.getElementById('canvas-container');
+
+      // Create renderer
+      renderer = new THREE.WebGPURenderer({ antialias: true });
+      await renderer.init();
+
+      // Detect backend
+      const isWebGPU = renderer.backend.isWebGPUBackend === true;
+      backendInfo.textContent = `Backend: ${isWebGPU ? 'WebGPU' : 'WebGL2'}`;
+
+      // Get GPU info
+      let gpuName = 'Unknown';
+      if (isWebGPU && renderer.backend.adapter?.info) {
+        gpuName = renderer.backend.adapter.info.device || 'Unknown GPU';
+      } else {
+        const canvas = document.createElement('canvas');
+        const gl = canvas.getContext('webgl2');
+        if (gl) {
+          const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+          if (debugInfo) {
+            gpuName = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+          }
+        }
+      }
+      gpuInfo.textContent = `GPU: ${gpuName}`;
+
+      // Setup
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x1a1a2e);
+      scene.fog = new THREE.Fog(0x1a1a2e, 50, 200);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 30, 80);
+      camera.lookAt(0, 0, 0);
+
+      // Terrain plane
+      const terrainGeo = new THREE.PlaneGeometry(400, 400, 100, 100);
+      const terrainMat = new THREE.MeshStandardMaterial({
+        color: 0x3a5a3a,
+        roughness: 0.9,
+        metalness: 0.1,
+      });
+      // Add some height variation
+      const positions = terrainGeo.attributes.position;
+      for (let i = 0; i < positions.count; i++) {
+        const x = positions.getX(i);
+        const y = positions.getY(i);
+        const z = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 5;
+        positions.setZ(i, z);
+      }
+      terrainGeo.computeVertexNormals();
+      const terrain = new THREE.Mesh(terrainGeo, terrainMat);
+      terrain.rotation.x = -Math.PI / 2;
+      terrain.receiveShadow = true;
+      scene.add(terrain);
+
+      // Lighting
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+      scene.add(ambientLight);
+
+      const sunLight = new THREE.DirectionalLight(0xffaa55, 1.5);
+      sunLight.position.set(50, 100, 50);
+      sunLight.castShadow = true;
+      sunLight.shadow.mapSize.width = 2048;
+      sunLight.shadow.mapSize.height = 2048;
+      sunLight.shadow.camera.near = 0.5;
+      sunLight.shadow.camera.far = 500;
+      sunLight.shadow.camera.left = -100;
+      sunLight.shadow.camera.right = 100;
+      sunLight.shadow.camera.top = 100;
+      sunLight.shadow.camera.bottom = -100;
+      scene.add(sunLight);
+
+      // Hemisphere light for environment
+      const hemiLight = new THREE.HemisphereLight(0xffeeb1, 0x080820, 0.5);
+      scene.add(hemiLight);
+
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFShadowMap;
+
+      // Resize handler
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Start render loop
+      renderer.setAnimationLoop(animate);
+    }
+
+    // Create instanced meshes for stress test
+    function createInstancedMeshes(count, material) {
+      const geometry = new THREE.BoxGeometry(1, 1, 1);
+      const mesh = new THREE.InstancedMesh(geometry, material, count);
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+
+      const matrix = new THREE.Matrix4();
+      const position = new THREE.Vector3();
+      const rotation = new THREE.Euler();
+      const scale = new THREE.Vector3(1, 1, 1);
+
+      for (let i = 0; i < count; i++) {
+        position.set(
+          (Math.random() - 0.5) * 200,
+          Math.random() * 20 + 2,
+          (Math.random() - 0.5) * 200
+        );
+        rotation.set(
+          Math.random() * Math.PI,
+          Math.random() * Math.PI,
+          Math.random() * Math.PI
+        );
+        scale.setScalar(Math.random() * 2 + 0.5);
+        matrix.compose(position, new THREE.Quaternion().setFromEuler(rotation), scale);
+        mesh.setMatrixAt(i, matrix);
+      }
+
+      mesh.instanceMatrix.needsUpdate = true;
+      scene.add(mesh);
+      instancedMeshes.push(mesh);
+      return mesh;
+    }
+
+    // Create particles
+    function createParticles(count) {
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+
+      for (let i = 0; i < count; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 200;
+        positions[i * 3 + 1] = Math.random() * 50 + 5;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 200;
+
+        colors[i * 3] = Math.random();
+        colors[i * 3 + 1] = Math.random();
+        colors[i * 3 + 2] = Math.random();
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const material = new THREE.PointsMaterial({
+        size: 0.5,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.6,
+      });
+
+      particles = new THREE.Points(geometry, material);
+      scene.add(particles);
+    }
+
+    // Animation loop
+    let time = 0;
+    function animate(timestamp) {
+      time = timestamp * 0.001;
+
+      // Track frame times during benchmark
+      if (benchmarkRunning) {
+        frameTimes.push(timestamp);
+      }
+
+      // Rotate camera
+      camera.position.x = Math.cos(time * 0.1) * 80;
+      camera.position.z = Math.sin(time * 0.1) * 80;
+      camera.lookAt(0, 10, 0);
+
+      // Animate particles
+      if (particles) {
+        particles.rotation.y = time * 0.05;
+      }
+
+      // Animate instanced meshes (slow rotation)
+      instancedMeshes.forEach((mesh) => {
+        mesh.rotation.y = time * 0.1;
+      });
+
+      renderer.render(scene, camera);
+
+      // Check if benchmark is done
+      if (benchmarkRunning && timestamp - benchmarkStartTime > 30000) {
+        finishBenchmark();
+      }
+    }
+
+    // Benchmark steps
+    async function runBenchmark() {
+      benchmarkRunning = true;
+      benchmarkStartTime = performance.now();
+      frameTimes = [];
+      runBtn.disabled = true;
+      resultsDiv.style.display = 'none';
+
+      // Clear previous instances
+      instancedMeshes.forEach((m) => scene.remove(m));
+      instancedMeshes = [];
+      if (particles) {
+        scene.remove(particles);
+        particles = null;
+      }
+
+      // Materials
+      const mat1 = new THREE.MeshStandardMaterial({ color: 0xc8a96e, roughness: 0.7 });
+      const mat2 = new THREE.MeshStandardMaterial({ color: 0x6a8caf, roughness: 0.5, metalness: 0.3 });
+      const mat3 = new THREE.MeshPhysicalMaterial({
+        color: 0x88ff88,
+        roughness: 0.2,
+        transmission: 0.6,
+        transparent: true,
+        opacity: 0.8,
+      });
+
+      // Step 1: 1k instances
+      stepIndicator.textContent = 'Step 1/5: 1,000 instances...';
+      createInstancedMeshes(1000, mat1);
+      await sleep(5000);
+
+      // Step 2: 10k instances
+      stepIndicator.textContent = 'Step 2/5: 10,000 instances...';
+      createInstancedMeshes(9000, mat2);
+      await sleep(5000);
+
+      // Step 3: 50k instances
+      stepIndicator.textContent = 'Step 3/5: 50,000 instances...';
+      createInstancedMeshes(40000, mat3);
+      await sleep(5000);
+
+      // Step 4: 200k instances
+      stepIndicator.textContent = 'Step 4/5: 200,000 instances...';
+      createInstancedMeshes(150000, mat1);
+      await sleep(5000);
+
+      // Step 5: Particles
+      stepIndicator.textContent = 'Step 5/5: 100,000 particles...';
+      createParticles(100000);
+      await sleep(5000);
+
+      stepIndicator.textContent = 'Benchmark running...';
+    }
+
+    function finishBenchmark() {
+      benchmarkRunning = false;
+      runBtn.disabled = false;
+      stepIndicator.textContent = '';
+
+      // Calculate stats
+      const durations = [];
+      for (let i = 1; i < frameTimes.length; i++) {
+        durations.push(frameTimes[i] - frameTimes[i - 1]);
+      }
+
+      const avg = durations.reduce((a, b) => a + b, 0) / durations.length;
+      const fps = Math.round(1000 / avg);
+      const sorted = [...durations].sort((a, b) => b - a);
+      const count1Percent = Math.max(1, Math.floor(sorted.length * 0.01));
+      const low1Percent = sorted.slice(0, count1Percent).reduce((a, b) => a + b, 0) / count1Percent;
+
+      const info = renderer.info;
+      const isWebGPU = renderer.backend.isWebGPUBackend === true;
+
+      const summary = {
+        timestamp: new Date().toISOString(),
+        buildId: 'P3-' + Date.now().toString(36),
+        browser: navigator.userAgent,
+        backend: isWebGPU ? 'WebGPU' : 'WebGL2',
+        gpu: gpuInfo.textContent.replace('GPU: ', ''),
+        adapter: isWebGPU && renderer.backend.adapter?.info ? {
+          vendor: renderer.backend.adapter.info.vendor,
+          device: renderer.backend.adapter.info.device,
+          architecture: renderer.backend.adapter.info.architecture,
+        } : null,
+        stats: {
+          avgFps: fps,
+          avgFrameMs: avg.toFixed(2),
+          low1PercentMs: low1Percent.toFixed(2),
+          totalFrames: frameTimes.length,
+          drawCalls: info.render.calls,
+          triangles: info.render.triangles,
+          points: info.render.points,
+          geometries: info.memory.geometries,
+          textures: info.memory.textures,
+        },
+        scene: {
+          instancedMeshes: instancedMeshes.length,
+          totalInstances: instancedMeshes.reduce((sum, m) => sum + m.count, 0),
+          particles: particles ? particles.geometry.attributes.position.count : 0,
+        },
+      };
+
+      // Display results
+      resultsDiv.style.display = 'block';
+      resultsDiv.textContent = JSON.stringify(summary, null, 2);
+
+      // Copy button
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = 'Copy to Clipboard';
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(JSON.stringify(summary, null, 2));
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => (copyBtn.textContent = 'Copy to Clipboard'), 2000);
+      };
+      resultsDiv.appendChild(copyBtn);
+
+      // Download button
+      const downloadBtn = document.createElement('button');
+      downloadBtn.textContent = 'Download JSON';
+      downloadBtn.onclick = () => {
+        const blob = new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `crownfall-bench-${summary.buildId}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      };
+      resultsDiv.appendChild(downloadBtn);
+    }
+
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    // Event listeners
+    runBtn.addEventListener('click', runBenchmark);
+
+    // Init
+    init().catch((err) => {
+      console.error('Init failed:', err);
+      backendInfo.textContent = 'Backend: ERROR';
+      gpuInfo.textContent = 'GPU: ' + err.message;
+    });
+  </script>
+</body>
+</html>
