@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P15 — Quests** ✅ COMPLETE
+**P16 — UI** ✅ COMPLETE
 
 ## What Exists
 
@@ -143,6 +143,18 @@
   - 6 SLICE quests authored as data (Briarhollow starting area)
   - Quest validator (no unreachable steps, no missing references)
   - Headless quest bot (automated testing)
+- **UI System (P16):**
+  - DOM + CSS only, no UI framework owning simulation state
+  - Main menu, pause menu, settings, death/respawn, loading screens
+  - HUD (health, stamina, mana, compass with POIs, quest tracker, prompts)
+  - Inventory/gear screen with equipment slots
+  - Map screen with fog-of-war placeholder
+  - Journal screen with quest list
+  - Dialogue screen with choices
+  - Photo mode (free camera, DoF, time-of-day, filters, high-res capture)
+  - Accessibility (scalable UI, colorblind palettes, subtitles, reduced shake, hold-to-toggle, rebinding)
+  - Keyboard and gamepad navigation everywhere
+  - Screen navigation system with back history
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -217,6 +229,7 @@
 - ✅ Merchant system tested (reputation-based pricing)
 - ✅ World flags tested (set, unset, check, export/import)
 - ✅ Quest tests pass (management, steps, choices, rewards, requirements)
+- ✅ UI tests pass (navigation, pause, photo mode, accessibility, key bindings)
 
 ## Known Bugs
 
@@ -227,14 +240,12 @@
 
 ## Next Prompt
 
-**P16 — UI System**
-- HUD (health, stamina, minimap)
-- Menus (main, pause, settings)
-- Dialogue UI
-- Quest log UI
-- Inventory UI
-- Crafting UI
-- Merchant UI
+**P17 — Audio System**
+- Background music (ambient, combat, exploration)
+- Sound effects (footsteps, combat, UI)
+- Spatial audio (3D positioning)
+- Music transitions (crossfade, layers)
+- Volume controls per category
 
 ## Files Next Session Must Read
 
@@ -254,7 +265,8 @@
 14. `docs/SETTLEMENTS.md` (settlement system documentation)
 15. `docs/AI.md` (AI system documentation)
 16. `docs/QUESTS.md` (quest system documentation)
-17. `docs/design/GAMEPLAY.md`
+17. `docs/UI.md` (UI system documentation)
+18. `docs/design/GAMEPLAY.md`
 14. `src/engine/characters/CharacterSystem.ts` (character orchestrator)
 15. `src/engine/characters/AnimationStateMachine.ts` (animation states)
 16. `src/engine/characters/Horse.ts` (horse system)
@@ -273,6 +285,17 @@
 29. `.depcruise.cjs`
 
 ## Session Notes
+
+- **P16 completed** - UI system implemented
+  - DOM + CSS only, no UI framework owning simulation state
+  - Complete HUD (health, stamina, mana, compass, quest tracker, prompts)
+  - All menu screens (main, pause, settings, death, loading)
+  - Game screens (inventory, map, journal, dialogue)
+  - Photo mode with free camera, DoF, time-of-day, filters, high-res capture
+  - Full accessibility (scalable UI, colorblind palettes, subtitles, reduced shake, hold-to-toggle, rebinding)
+  - Keyboard and gamepad navigation
+  - UI documentation at `docs/UI.md`
+  - UI tests passing (navigation, pause, photo mode, accessibility)
 
 - **P15 completed** - Quest system implemented
   - Schema-validated quest graph with 7 step types

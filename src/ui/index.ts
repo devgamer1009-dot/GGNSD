@@ -1,5 +1,13 @@
 /**
- * UI layer — React components. May import engine, game, content.
- * UI frameworks NEVER own simulation state.
+ * UI Module
+ * P16 - Complete UI system
  */
-export const UI_VERSION = '0.1.0';
+
+export * from './UIManager.js';
+export * from './HUD.js';
+export * from './Menus.js';
+export * from './GameScreens.js';
+export * from './PhotoMode.js';
+export * from './Accessibility.js';
+export * from './UIInputHandler.js';
+export * from './GameUI.js';
