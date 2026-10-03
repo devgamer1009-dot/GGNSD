@@ -30,10 +30,10 @@
 ## UI & UX (P17–P18)
 
 - [x] **P17** — Audio system (Web Audio API, mixer buses, spatialization, procedural SFX, adaptive music, reverb zones) ✅
+- [x] **P18** — Save/Load system (IndexedDB, migrations, checksums, autosave, export/import, settings) ✅
 
-## Polish (P18–P21)
+## Polish (P19–P21)
 
-- [ ] **P18** — Save/Load system (IndexedDB, worker)
 - [ ] **P19** — Performance optimization pass
 - [ ] **P20** — Content creation (quests, NPCs, items)
 - [ ] **P21** — Beta release, bug fixes, balance

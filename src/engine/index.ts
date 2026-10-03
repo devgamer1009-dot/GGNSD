@@ -57,3 +57,6 @@ export * from './quests/index.js';
 
 // Audio module
 export * from './audio/index.js';
+
+// Save module
+export * from './saves/index.js';

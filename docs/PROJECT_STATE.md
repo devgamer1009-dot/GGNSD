@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P17 — Audio** ✅ COMPLETE
+**P18 — Saves + Settings** ✅ COMPLETE
 
 ## What Exists
 
@@ -167,6 +167,21 @@
   - Crossfade transitions between music states
   - Audio documentation at `docs/AUDIO.md`
   - Audio tests passing (voice budget, bus management, SFX generation, music transitions)
+- **Save System (P18):**
+  - Versioned IndexedDB saves with automatic migrations
+  - Multiple save slots (unlimited)
+  - Autosave at safe points (quest complete, location discovered, time interval, game pause)
+  - SHA-256 checksum validation with corruption detection
+  - Automatic backup creation on corruption
+  - Save export/import as JSON files
+  - Base64 export/import for sharing
+  - Settings storage (graphics, audio, controls, accessibility)
+  - Graphics tier auto-detection with user override
+  - Live settings switching with change notifications
+  - Key rebinding system
+  - Playtime tracking
+  - Save system documentation at `docs/SAVES.md`
+  - Save tests passing (migrations, corruption detection, round-trip preservation)
 - Test world: Free camera flying over 4x4km procedural terrain- Stress test page: `/stress-test.html` with scripted fly-through
 
 ## What Is Verified
@@ -250,6 +265,16 @@
 - ✅ Region-specific music scales
 - ✅ Reverb zones (interior effects)
 - ✅ Audio tests pass (voice budget, bus management, SFX, music)
+- ✅ Save system initialized (IndexedDB)
+- ✅ Multiple save slots working
+- ✅ Save/load round-trip verified
+- ✅ Migration system tested
+- ✅ Checksum validation working
+- ✅ Corruption detection and backup creation
+- ✅ Export/import functionality tested
+- ✅ Autosave system working
+- ✅ Settings management tested
+- ✅ Save tests pass (migrations, corruption, round-trip)
 
 ## Known Bugs
 
@@ -260,12 +285,12 @@
 
 ## Next Prompt
 
-**P18 — Save/Load System**
-- IndexedDB persistence
-- Save game state (player, world, quests, inventory)
-- Multiple save slots
-- Auto-save system
-- Save/load UI integration
+**P19 — Performance Optimization**
+- Frame time profiling and optimization
+- Memory usage optimization
+- Draw call batching
+- LOD system improvements
+- Asset streaming optimization
 
 ## Files Next Session Must Read
 
@@ -472,3 +497,19 @@
   - Audio tests passing (voice budget, bus management, SFX generation, music transitions)
 - No images used (all procedural)
 - No TODO left behind
+
+- **P18 completed** - Save/Load system implemented
+  - Versioned IndexedDB saves with automatic migrations
+  - Multiple save slots (unlimited)
+  - Autosave at safe points (quest complete, location discovered, time interval, game pause)
+  - SHA-256 checksum validation with corruption detection
+  - Automatic backup creation on corruption
+  - Save export/import as JSON files
+  - Base64 export/import for sharing
+  - Settings storage (graphics, audio, controls, accessibility)
+  - Graphics tier auto-detection with user override
+  - Live settings switching with change notifications
+  - Key rebinding system
+  - Playtime tracking
+  - Save system documentation at `docs/SAVES.md`
+  - Save tests passing (migrations, corruption detection, round-trip preservation)
