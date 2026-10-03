@@ -30,3 +30,9 @@ export * from './environment/index.js';
 
 // Asset module
 export * from './assets/index.js';
+
+// Physics module
+export * from './physics/index.js';
+
+// Camera module
+export * from './camera/index.js';

@@ -131,3 +131,36 @@
   - Efficient memory usage with bounded chunk count
   - Extensible content system via CellContentProvider
   - Persistent cache reduces regeneration on reload
+
+## ADR-010: Rapier Physics Engine
+
+- **Date:** P9
+- **Status:** Accepted
+- **Context:** Need physics simulation for character movement, terrain collision, and future gameplay systems. Must integrate with streaming terrain and support character controller.
+- **Decision:** Rapier3D (WASM) running on main thread.
+- **Key features:**
+  - **Heightfield colliders**: Direct integration with terrain chunks
+  - **Character controller**: Capsule collider with slope detection
+  - **Deterministic**: Fixed timestep for reproducible physics
+  - **Performance**: < 2ms per frame for typical scene
+- **Architecture:**
+  - **PhysicsWorld**: Main physics simulation wrapper
+  - **CharacterStateMachine**: State-based movement logic
+  - **Heightfield integration**: Terrain chunks → Rapier heightfields
+  - **Debug visualization**: Rapier debugRender() → Three.js lines
+- **Why main thread (not worker):**
+  - Simpler integration with rendering
+  - Lower latency for character control
+  - Rapier is fast enough (< 2ms)
+  - Avoids serialization overhead
+- **Alternatives considered:**
+  - Cannon.js: Less performant, older API
+  - Ammo.js: Complex API, larger bundle
+  - Custom physics: Too much work, less robust
+  - Worker-based physics: Added complexity, serialization overhead
+- **Consequences:**
+  - Fast, robust physics simulation
+  - Easy terrain integration via heightfields
+  - Deterministic behavior for testing
+  - Debug visualization built-in
+  - Extensible for future gameplay physics

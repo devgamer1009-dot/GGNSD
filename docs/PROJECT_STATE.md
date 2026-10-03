@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P8 — Asset Pipeline** ✅ COMPLETE
+**P9 — Player Movement** ✅ COMPLETE
 
 ## What Exists
 
@@ -70,6 +70,14 @@
   - Versioned cache keys (IndexedDB backend)
   - Asset gallery page: `/assets/gallery.html`
   - Sample manifest with all parametric assets
+- **Player Movement (P9):**
+  - Character state machine (8 states: idle, walk, sprint, jump, fall, steep-slope slide, swim, dodge)
+  - Rapier physics integration (WASM, main thread)
+  - Heightfield terrain colliders from streaming chunks
+  - Third-person camera with orbit, collision, and lock-on
+  - Physics debug visualization (F4 toggle)
+  - State transition table with extensibility for climb/glide/mount
+  - Input via actions only (no direct key bindings)
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -110,6 +118,11 @@
 - ✅ Environment tests pass (time/weather transitions, wind field, region weather)
 - ✅ Asset pipeline tests pass (manifest validation, parametric generators, LOD selection, caching)
 - ✅ Asset gallery page renders all parametric assets with 3D previews
+- ✅ Physics system initialized (Rapier WASM)
+- ✅ Character state machine (8 states, transitions working)
+- ✅ Third-person camera (orbit, zoom, lock-on)
+- ✅ Physics debug visualization (F4 toggle)
+- ✅ Movement tests pass (state transitions, slope detection)
 
 ## Known Bugs
 
@@ -120,7 +133,7 @@
 
 ## Next Prompt
 
-**P9 — Vegetation & Prop Placement**
+**P10 — Vegetation & Prop Placement**
 - Tree placement based on biome and slope
 - Grass/ground cover with wind animation
 - Rock placement in mountainous regions
@@ -134,22 +147,38 @@
 2. `docs/ARCHITECTURE.md`
 3. `docs/CONVENTIONS.md`
 4. `docs/PERFORMANCE.md`
-5. `docs/DECISIONS.md` (ADR-006: renderer, ADR-007: ECS, ADR-008: chunk size, ADR-009: streaming)
+5. `docs/DECISIONS.md` (ADR-006: renderer, ADR-007: ECS, ADR-008: chunk size, ADR-009: streaming, ADR-010: Rapier physics)
 6. `docs/TERRAIN.md` (terrain system documentation)
 7. `docs/STREAMING.md` (streaming system documentation)
 8. `docs/ENVIRONMENT.md` (environment system documentation)
 9. `docs/ASSETS.md` (asset pipeline documentation)
-10. `docs/design/GAMEPLAY.md`
-11. `src/engine/assets/manager.ts` (asset manager)
-12. `src/engine/streaming/StreamingManager.ts`
-13. `src/engine/terrain/TerrainSystem.ts`
-14. `src/engine/environment/EnvironmentManager.ts`
-15. `src/engine/render/Renderer.ts`
-16. `src/engine/index.ts`
-17. `tsconfig.json`
-18. `.depcruise.cjs`
+10. `docs/MOVEMENT.md` (player movement documentation)
+11. `docs/design/GAMEPLAY.md`
+12. `src/engine/physics/PhysicsWorld.ts` (physics integration)
+13. `src/engine/physics/CharacterStateMachine.ts` (state machine)
+14. `src/engine/camera/ThirdPersonCamera.ts` (camera system)
+15. `src/engine/assets/manager.ts` (asset manager)
+16. `src/engine/streaming/StreamingManager.ts`
+17. `src/engine/terrain/TerrainSystem.ts`
+18. `src/engine/environment/EnvironmentManager.ts`
+19. `src/engine/render/Renderer.ts`
+20. `src/engine/index.ts`
+21. `tsconfig.json`
+22. `.depcruise.cjs`
 
 ## Session Notes
+
+- **P9 completed** - Player movement system implemented
+  - Character state machine with 8 states (idle, walk, sprint, jump, fall, steep-slope slide, swim, dodge)
+  - Rapier physics integration (WASM, main thread, no worker needed)
+  - Heightfield terrain colliders from streaming chunks
+  - Third-person camera with orbit, collision, and lock-on
+  - Physics debug visualization (F4 toggle)
+  - State transition table with extensibility for future states (climb, glide, mount)
+  - Input via actions only (no direct key bindings)
+  - Movement documentation at `docs/MOVEMENT.md`
+  - Movement tests passing (state transitions, slope detection)
+  - Installed @dimforge/rapier3d-compat for physics
 
 - **AUDIT completed** - Comprehensive code audit performed
   - Fixed 3 critical/high priority issues

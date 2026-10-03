@@ -18,29 +18,28 @@
 
 ## World (P9–P12)
 
-- [ ] **P9** — Vegetation & prop placement (biome-based, wind animation, instancing, CellContentProvider)
-- [ ] **P10** — Camera system (perspective, ortho, controls)
+- [x] **P9** — Player movement (character state machine, Rapier physics, heightfield colliders, third-person camera, lock-on, debug visualization) ✅
+- [ ] **P10** — Vegetation & prop placement (biome-based, wind animation, instancing, CellContentProvider)
 - [ ] **P11** — Water bodies (lakes, rivers with flow)
 - [ ] **P12** — Structure placement (buildings, ruins, waypoints)
 
 ## Gameplay (P13–P17)
 
-- [ ] **P13** — Player controller (movement, camera)
-- [ ] **P14** — NPC system (AI, pathfinding)
-- [ ] **P15** — Combat system (melee, ranged, damage)
-- [ ] **P16** — Inventory & items
-- [ ] **P17** — Quest system
+- [ ] **P13** — NPC system (AI, pathfinding)
+- [ ] **P14** — Combat system (melee, ranged, damage)
+- [ ] **P15** — Inventory & items
+- [ ] **P16** — Quest system
+- [ ] **P17** — Dialog system
 
 ## UI & UX (P18–P20)
 
 - [ ] **P18** — HUD (health, stamina, minimap)
 - [ ] **P19** — Menus (main, pause, settings)
-- [ ] **P20** — Dialog system
+- [ ] **P20** — Audio system (SFX, music, ambient)
 
-## Polish (P21–P25)
+## Polish (P21–P24)
 
-- [ ] **P21** — Audio system (SFX, music, ambient)
-- [ ] **P22** — Save/Load system (IndexedDB, worker)
-- [ ] **P23** — Performance optimization pass
-- [ ] **P24** — Content creation (quests, NPCs, items)
-- [ ] **P25** — Beta release, bug fixes, balance
+- [ ] **P21** — Save/Load system (IndexedDB, worker)
+- [ ] **P22** — Performance optimization pass
+- [ ] **P23** — Content creation (quests, NPCs, items)
+- [ ] **P24** — Beta release, bug fixes, balance
