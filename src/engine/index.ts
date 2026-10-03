@@ -60,3 +60,6 @@ export * from './audio/index.js';
 
 // Save module
 export * from './saves/index.js';
+
+// Bosses module
+export * from './bosses/index.js';

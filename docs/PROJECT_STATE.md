@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P20 — Region: Thornwood** ✅ COMPLETE
+**P21 — Bosses** ✅ COMPLETE
 
 ## What Exists
 
@@ -216,6 +216,18 @@
   - All validators passing
   - Review documentation at `docs/review/THORNWOOD_REVIEW.md`
   - Test coverage at `tests/thornwood.test.ts`
+- **Boss System (P21):**
+  - Multi-phase boss framework with health thresholds
+  - Telegraph system for attack warnings (visual + timing)
+  - Arena system with boundaries, hazards, and obstacles
+  - Cinematic camera system for intros and phase transitions
+  - Thornmother boss implementation (3 phases, 9 attacks)
+  - Weighted attack selection with cooldowns and priorities
+  - Phase transition cinematics with dialogue
+  - Arena rule changes per phase
+  - Loot table system
+  - Boss documentation at `docs/BOSSES.md`
+  - Boss tests passing (phase transitions, attack selection, telegraphs)
 - Test world: Free camera flying over 4x4km procedural terrain- Stress test page: `/stress-test.html` with scripted fly-through
 
 ## What Is Verified
@@ -324,6 +336,29 @@
 - ✅ Color grading with palette and post-processing
 - ✅ Weather weights sum to 1.0
 - ✅ All region tests passing
+- ✅ Boss framework phase transitions working
+- ✅ Attack selection with priorities and cooldowns
+- ✅ Telegraph system timing and detection
+- ✅ Arena boundary enforcement
+- ✅ Hazard zone damage detection
+- ✅ Cinematic camera interpolation
+- ✅ Thornmother boss 3-phase fight functional
+- ✅ Boss tests pass (phase transitions, attacks, telegraphs, arena)
+
+## Session Notes
+
+- **P21 completed** - Boss system implemented
+  - Multi-phase boss framework with health thresholds
+  - Telegraph system for attack warnings (visual + timing)
+  - Arena system with boundaries, hazards, and obstacles
+  - Cinematic camera system for intros and phase transitions
+  - Thornmother boss implementation (3 phases, 9 attacks)
+  - Weighted attack selection with cooldowns and priorities
+  - Phase transition cinematics with dialogue
+  - Arena rule changes per phase
+  - Loot table system
+  - Boss documentation at `docs/BOSSES.md`
+  - Boss tests passing (phase transitions, attack selection, telegraphs)
 
 ## Known Bugs
 
@@ -334,13 +369,12 @@
 
 ## Next Prompt
 
-**P21 — Region: Ironcrag**
-- Mountain region with snow and mines
-- 3 settlements: Deepdelve, Frostkeep, Anvilgate
-- 2 enemy variants: Ice Wraith, Mine Horror
-- 6 quests (3 main + 3 side)
-- Industrial atmosphere with dwarven influence
-- Forge-Lord Kaelin boss fight
+**P22 — Performance Optimization**
+- Frame time profiling and optimization
+- Memory usage optimization
+- Draw call batching
+- LOD system improvements
+- Asset streaming optimization
 
 ## Files Next Session Must Read
 

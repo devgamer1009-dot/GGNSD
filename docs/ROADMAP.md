@@ -36,7 +36,8 @@
 
 - [x] **P19** — SLICE integration (game state, quest progression, save/load, audio, basic scene) ✅
 - [x] **P20** — Region: Thornwood (ancient forest, fey village, 6 quests, 2 enemies, 8 landmarks) ✅
-- [ ] **P21** — Region: Ironcrag (mountains, mines, 3 settlements, 6 quests, 2 enemies)
+- [x] **P21** — Boss system (multi-phase framework, telegraphs, arena, cinematics, Thornmother boss) ✅
+- [ ] **P22** — Performance optimization pass
 
 ## Polish (P22–P23)
 
