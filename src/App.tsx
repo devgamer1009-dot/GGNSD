@@ -1,280 +1,286 @@
 import { useEffect, useRef, useState } from 'react';
-import { Renderer, DebugOverlay } from './engine/render/index.js';
-import { StreamingManager, type CellContentProvider } from './engine/streaming/index.js';
-import { EnvironmentManager, EnvironmentDebugPanel } from './engine/environment/index.js';
-import type { TerrainChunkData } from './engine/terrain/index.js';
-import * as THREE from 'three/webgpu';
+import * as THREE from 'three';
 
 /**
- * CrownFall — Streaming Test (P6)
- *
- * Free camera flying over procedurally generated terrain with streaming system.
+ * CrownFall — Playable Game
+ * Third-person character with WASD controls
  */
 export default function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const [backend, setBackend] = useState<string>('Initializing...');
-  const [stats, setStats] = useState({ loadedChunks: 0, pendingRequests: 0, busyWorkers: 0 });
-  const [environment, setEnvironment] = useState<EnvironmentManager | null>(null);
+  const [playerPos, setPlayerPos] = useState({ x: 0, y: 2, z: 0 });
+  const [fps, setFps] = useState(0);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    let renderer: Renderer | null = null;
-    let debugOverlay: DebugOverlay | null = null;
-    let streamingManager: StreamingManager | null = null;
-    let environmentManager: EnvironmentManager | null = null;
+    // Scene setup
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb); // Sky blue
+    scene.fog = new THREE.Fog(0x87ceeb, 100, 500);
 
-    const init = async () => {
-      try {
-        // Create renderer
-        renderer = new Renderer({
-          antialias: true,
-          powerPreference: 'high-performance',
-        });
+    // Camera
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+    camera.position.set(0, 5, 10);
 
-        const info = await renderer.init();
-        setBackend(`${info.backend} — ${info.renderer}`);
-        container.appendChild(renderer.domElement);
+    // Renderer
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(renderer.domElement);
 
-        // Handle resize
-        const resize = () => {
-          const width = window.innerWidth;
-          const height = window.innerHeight;
-          renderer!.setSize(width, height);
-          camera.aspect = width / height;
-          camera.updateProjectionMatrix();
-        };
-        resize();
-        window.addEventListener('resize', resize);
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
 
-        // Create scene
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87ceeb);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    directionalLight.position.set(50, 100, 50);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.near = 0.5;
+    directionalLight.shadow.camera.far = 500;
+    directionalLight.shadow.camera.left = -100;
+    directionalLight.shadow.camera.right = 100;
+    directionalLight.shadow.camera.top = 100;
+    directionalLight.shadow.camera.bottom = -100;
+    scene.add(directionalLight);
 
-        // Camera
-        const camera = new THREE.PerspectiveCamera(
-          75,
-          window.innerWidth / window.innerHeight,
-          0.1,
-          5000
-        );
-        camera.position.set(0, 100, 0);
+    // Ground
+    const groundGeometry = new THREE.PlaneGeometry(1000, 1000, 50, 50);
+    const groundMaterial = new THREE.MeshStandardMaterial({
+      color: 0x3a7d44,
+      roughness: 0.8,
+      metalness: 0.2,
+    });
+    
+    // Add some height variation to ground
+    const positionAttribute = groundGeometry.attributes.position;
+    if (positionAttribute) {
+      for (let i = 0; i < positionAttribute.count; i++) {
+        const x = positionAttribute.getX(i);
+        const y = positionAttribute.getY(i);
+        const height = Math.sin(x * 0.05) * Math.cos(y * 0.05) * 2;
+        positionAttribute.setZ(i, height);
+      }
+      groundGeometry.computeVertexNormals();
+    }
+    
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.receiveShadow = true;
+    scene.add(ground);
 
-        // Initialize environment system
-        environmentManager = new EnvironmentManager(scene);
-        setEnvironment(environmentManager);
+    // Player character (simple cube)
+    const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
+    const playerMaterial = new THREE.MeshStandardMaterial({
+      color: 0xc8a96e,
+      roughness: 0.6,
+      metalness: 0.3,
+    });
+    const player = new THREE.Mesh(playerGeometry, playerMaterial);
+    player.position.set(0, 2, 0);
+    player.castShadow = true;
+    player.receiveShadow = true;
+    scene.add(player);
 
-        // Initialize streaming system
-        streamingManager = new StreamingManager(
-          128,
-          { full: 400, near: 800, far: 1600, unloaded: 2400 },
-          12345,
-          '1.0.0',
-          100
-        );
-        await streamingManager.init();
+    // Add some trees
+    const treeGeometry = new THREE.ConeGeometry(2, 6, 8);
+    const treeMaterial = new THREE.MeshStandardMaterial({
+      color: 0x2d5016,
+      roughness: 0.8,
+    });
+    const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.5, 3, 8);
+    const trunkMaterial = new THREE.MeshStandardMaterial({
+      color: 0x4a3728,
+      roughness: 0.9,
+    });
 
-        // Terrain material
-        const terrainMaterial = new THREE.MeshStandardMaterial({
-          vertexColors: true,
-          flatShading: false,
-        });
+    for (let i = 0; i < 50; i++) {
+      const tree = new THREE.Group();
+      
+      const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+      trunk.position.y = 1.5;
+      trunk.castShadow = true;
+      tree.add(trunk);
+      
+      const leaves = new THREE.Mesh(treeGeometry, treeMaterial);
+      leaves.position.y = 5;
+      leaves.castShadow = true;
+      tree.add(leaves);
+      
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 20 + Math.random() * 80;
+      tree.position.set(
+        Math.cos(angle) * distance,
+        0,
+        Math.sin(angle) * distance
+      );
+      
+      scene.add(tree);
+    }
 
-        // Example content provider (vegetation placeholder)
-        const vegetationProvider: CellContentProvider = {
-          id: 'vegetation',
-          async generateContent(chunkX: number, chunkZ: number, chunkData: TerrainChunkData) {
-            // Placeholder: would generate trees/grass based on biome
-            return { trees: [], grass: [] };
-          },
-          disposeContent(chunkX: number, chunkZ: number) {
-            // Cleanup vegetation meshes
-          },
-        };
+    // Add some rocks
+    const rockGeometry = new THREE.DodecahedronGeometry(1.5, 0);
+    const rockMaterial = new THREE.MeshStandardMaterial({
+      color: 0x808080,
+      roughness: 0.9,
+      metalness: 0.1,
+    });
 
-        streamingManager.registerContentProvider(vegetationProvider);
+    for (let i = 0; i < 30; i++) {
+      const rock = new THREE.Mesh(rockGeometry, rockMaterial);
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 15 + Math.random() * 60;
+      rock.position.set(
+        Math.cos(angle) * distance,
+        0.75,
+        Math.sin(angle) * distance
+      );
+      rock.rotation.set(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI
+      );
+      rock.castShadow = true;
+      rock.receiveShadow = true;
+      scene.add(rock);
+    }
 
-        // Camera controls
-        const keys: Record<string, boolean> = {};
-        let yaw = 0;
-        let pitch = 0;
-        let isPointerLocked = false;
+    // Input handling
+    const keys: Record<string, boolean> = {};
+    const handleKeyDown = (e: KeyboardEvent) => {
+      keys[e.key.toLowerCase()] = true;
+    };
+    const handleKeyUp = (e: KeyboardEvent) => {
+      keys[e.key.toLowerCase()] = false;
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
-        window.addEventListener('keydown', (e) => {
-          keys[e.code] = true;
-        });
+    // Mouse look
+    let yaw = 0;
+    let pitch = 0;
+    let isPointerLocked = false;
 
-        window.addEventListener('keyup', (e) => {
-          keys[e.code] = false;
-        });
+    const handleClick = () => {
+      container.requestPointerLock();
+    };
+    container.addEventListener('click', handleClick);
 
-        container.addEventListener('click', () => {
-          container.requestPointerLock();
-        });
+    const handlePointerLockChange = () => {
+      isPointerLocked = document.pointerLockElement === container;
+    };
+    document.addEventListener('pointerlockchange', handlePointerLockChange);
 
-        document.addEventListener('pointerlockchange', () => {
-          isPointerLocked = document.pointerLockElement === container;
-        });
-
-        document.addEventListener('mousemove', (e) => {
-          if (isPointerLocked) {
-            yaw -= e.movementX * 0.002;
-            pitch -= e.movementY * 0.002;
-            pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch));
-          }
-        });
-
-        // Debug overlay
-        debugOverlay = new DebugOverlay(renderer);
-
-        // Animation loop
-        let lastTime = performance.now();
-        const cameraVelocity = new THREE.Vector3();
-
-        renderer.setAnimationLoop(() => {
-          const now = performance.now();
-          const dt = (now - lastTime) / 1000;
-          lastTime = now;
-
-          // Camera movement
-          const speed = keys['ShiftLeft'] ? 200 : 100;
-          const forward = new THREE.Vector3(
-            -Math.sin(yaw) * Math.cos(pitch),
-            Math.sin(pitch),
-            -Math.cos(yaw) * Math.cos(pitch)
-          );
-          const right = new THREE.Vector3(
-            Math.cos(yaw),
-            0,
-            -Math.sin(yaw)
-          );
-
-          cameraVelocity.set(0, 0, 0);
-
-          if (keys['KeyW']) cameraVelocity.add(forward.clone().multiplyScalar(speed * dt));
-          if (keys['KeyS']) cameraVelocity.add(forward.clone().multiplyScalar(-speed * dt));
-          if (keys['KeyA']) cameraVelocity.add(right.clone().multiplyScalar(-speed * dt));
-          if (keys['KeyD']) cameraVelocity.add(right.clone().multiplyScalar(speed * dt));
-          if (keys['Space']) cameraVelocity.y += speed * dt;
-          if (keys['KeyC']) cameraVelocity.y -= speed * dt;
-
-          camera.position.add(cameraVelocity);
-          camera.rotation.set(pitch, yaw, 0, 'YXZ');
-
-          // Update environment
-          environmentManager!.update(dt, camera.position);
-
-          // Update streaming
-          streamingManager!.update(camera.position.x, camera.position.z);
-
-          // Create meshes for newly loaded chunks
-          const chunks = streamingManager!.getAllChunks();
-          for (const chunkData of chunks) {
-            // Determine LOD from resolution
-            let lod = 0;
-            if (chunkData.resolution === 64) lod = 1;
-            else if (chunkData.resolution === 32) lod = 2;
-            else if (chunkData.resolution === 16) lod = 3;
-
-            if (!streamingManager!.getChunkMesh(chunkData.chunkX, chunkData.chunkZ, lod)) {
-              // Create mesh
-              const verticesPerSide = chunkData.resolution + 1;
-              const geometry = new THREE.BufferGeometry();
-
-              const positions = new Float32Array(verticesPerSide * verticesPerSide * 3);
-              const colors = new Float32Array(verticesPerSide * verticesPerSide * 3);
-
-              for (let z = 0; z < verticesPerSide; z++) {
-                for (let x = 0; x < verticesPerSide; x++) {
-                  const idx = z * verticesPerSide + x;
-                  const vertIdx = idx * 3;
-
-                  const worldX = chunkData.chunkX * chunkData.size + (x / chunkData.resolution) * chunkData.size - 2000;
-                  const worldZ = chunkData.chunkZ * chunkData.size + (z / chunkData.resolution) * chunkData.size - 2000;
-                  const worldY = chunkData.heights[idx]! * 200;
-
-                  positions[vertIdx] = worldX;
-                  positions[vertIdx + 1] = worldY;
-                  positions[vertIdx + 2] = worldZ;
-
-                  const biome = chunkData.biomes[idx]!;
-                  let r = 0.5, g = 0.5, b = 0.5;
-                  
-                  if (biome === 0) { r = 0.1; g = 0.2; b = 0.5; }
-                  else if (biome === 1) { r = 0.8; g = 0.7; b = 0.5; }
-                  else if (biome === 2) { r = 0.4; g = 0.6; b = 0.2; }
-                  else if (biome === 3) { r = 0.2; g = 0.4; b = 0.1; }
-                  else if (biome === 4) { r = 0.5; g = 0.5; b = 0.3; }
-                  else if (biome === 5) { r = 0.4; g = 0.4; b = 0.4; }
-                  else if (biome === 6) { r = 0.9; g = 0.9; b = 0.95; }
-                  else if (biome === 7) { r = 0.9; g = 0.8; b = 0.5; }
-
-                  colors[vertIdx] = r;
-                  colors[vertIdx + 1] = g;
-                  colors[vertIdx + 2] = b;
-                }
-              }
-
-              const indices = [];
-              for (let z = 0; z < verticesPerSide - 1; z++) {
-                for (let x = 0; x < verticesPerSide - 1; x++) {
-                  const topLeft = z * verticesPerSide + x;
-                  const topRight = topLeft + 1;
-                  const bottomLeft = (z + 1) * verticesPerSide + x;
-                  const bottomRight = bottomLeft + 1;
-
-                  indices.push(topLeft, bottomLeft, topRight);
-                  indices.push(topRight, bottomLeft, bottomRight);
-                }
-              }
-
-              geometry.setIndex(indices);
-              geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-              geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-              geometry.computeVertexNormals();
-
-              const mesh = new THREE.Mesh(geometry, terrainMaterial);
-              scene.add(mesh);
-              streamingManager!.setChunkMesh(chunkData.chunkX, chunkData.chunkZ, lod, mesh);
-            }
-          }
-
-          // Remove meshes for unloaded chunks
-          const allMeshes = streamingManager!.getAllChunkMeshes();
-          for (const mesh of allMeshes) {
-            if (!scene.children.includes(mesh)) {
-              mesh.geometry.dispose();
-            }
-          }
-
-          // Update stats
-          const streamingStats = streamingManager!.getStats();
-          setStats({
-            loadedChunks: streamingStats.loadedChunks,
-            pendingRequests: streamingStats.pendingRequests,
-            busyWorkers: streamingStats.busyWorkers,
-          });
-
-          renderer!.render(scene, camera);
-          debugOverlay?.update(now);
-        });
-
-        console.log('[CrownFall] Streaming system initialized');
-      } catch (err) {
-        console.error('[CrownFall] Initialization failed:', err);
-        setError(err instanceof Error ? err.message : 'Unknown error');
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isPointerLocked) {
+        yaw -= e.movementX * 0.002;
+        pitch -= e.movementY * 0.002;
+        pitch = Math.max(-Math.PI / 3, Math.min(Math.PI / 3, pitch));
       }
     };
+    document.addEventListener('mousemove', handleMouseMove);
 
-    init();
+    // Resize handler
+    const handleResize = () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', handleResize);
 
+    // Game loop
+    const playerVelocity = new THREE.Vector3();
+    const playerSpeed = 10;
+    let lastTime = performance.now();
+    let frameCount = 0;
+    let lastFpsUpdate = performance.now();
+
+    const animate = () => {
+      const currentTime = performance.now();
+      const deltaTime = (currentTime - lastTime) / 1000;
+      lastTime = currentTime;
+
+      // FPS counter
+      frameCount++;
+      if (currentTime - lastFpsUpdate >= 1000) {
+        setFps(frameCount);
+        frameCount = 0;
+        lastFpsUpdate = currentTime;
+      }
+
+      // Player movement
+      playerVelocity.set(0, 0, 0);
+      const moveSpeed = playerSpeed * deltaTime;
+
+      if (keys['w']) playerVelocity.z -= moveSpeed;
+      if (keys['s']) playerVelocity.z += moveSpeed;
+      if (keys['a']) playerVelocity.x -= moveSpeed;
+      if (keys['d']) playerVelocity.x += moveSpeed;
+
+      // Apply rotation to movement
+      if (playerVelocity.length() > 0) {
+        playerVelocity.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+        player.position.add(playerVelocity);
+        
+        // Rotate player to face movement direction
+        player.rotation.y = yaw + Math.PI;
+      }
+
+      // Update player position state
+      setPlayerPos({
+        x: Math.round(player.position.x * 10) / 10,
+        y: Math.round(player.position.y * 10) / 10,
+        z: Math.round(player.position.z * 10) / 10,
+      });
+
+      // Camera follow (third person)
+      const cameraOffset = new THREE.Vector3(0, 5, 10);
+      cameraOffset.applyAxisAngle(new THREE.Vector3(1, 0, 0), pitch);
+      cameraOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+      
+      const targetCameraPos = player.position.clone().add(cameraOffset);
+      camera.position.lerp(targetCameraPos, 0.1);
+      camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
+
+      // Render
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    // Cleanup
     return () => {
-      debugOverlay?.dispose();
-      streamingManager?.dispose();
-      environmentManager?.dispose();
-      renderer?.dispose();
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('pointerlockchange', handlePointerLockChange);
+      container.removeEventListener('click', handleClick);
+      
+      if (container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
+      }
+      
+      renderer.dispose();
+      scene.traverse((object) => {
+        if (object instanceof THREE.Mesh) {
+          object.geometry.dispose();
+          if (object.material instanceof THREE.Material) {
+            object.material.dispose();
+          }
+        }
+      });
     };
   }, []);
 
@@ -301,6 +307,8 @@ export default function App() {
   return (
     <div style={{ width: '100%', height: '100vh', position: 'relative' }}>
       <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+      
+      {/* HUD */}
       <div style={{
         position: 'absolute',
         top: '20px',
@@ -310,23 +318,21 @@ export default function App() {
         fontSize: '14px',
         background: 'rgba(0, 0, 0, 0.7)',
         padding: '15px',
-        borderRadius: '4px',
+        borderRadius: '8px',
         lineHeight: '1.6',
       }}>
-        <div><strong>CrownFall P7 — Environment</strong></div>
-        <div>Backend: {backend}</div>
-        <div>Loaded Chunks: {stats.loadedChunks}</div>
-        <div>Pending: {stats.pendingRequests}</div>
-        <div>Busy Workers: {stats.busyWorkers}</div>
+        <div style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', color: '#c8a96e' }}>
+          CrownFall
+        </div>
+        <div>FPS: {fps}</div>
+        <div>Position: ({playerPos.x}, {playerPos.y}, {playerPos.z})</div>
         <div style={{ marginTop: '10px', fontSize: '12px', color: '#aaa' }}>
           <div>Click to lock mouse</div>
-          <div>WASD — Move</div>
-          <div>Space/C — Up/Down</div>
-          <div>Shift — Fast</div>
-          <div>F3 — Debug overlay</div>
+          <div>WASD - Move</div>
+          <div>Mouse - Look around</div>
+          <div>ESC - Unlock mouse</div>
         </div>
       </div>
-      {environment && <EnvironmentDebugPanel environment={environment} />}
     </div>
   );
 }

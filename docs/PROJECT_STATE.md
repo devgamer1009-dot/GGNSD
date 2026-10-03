@@ -4,7 +4,15 @@
 
 ## Current Phase
 
-**P24 — RELEASE** ✅ COMPLETE
+**MODE: START (LOOP-0)** - Playable Game Demo
+
+### Simplified to Playable State
+- ✅ Third-person character controller (WASD + mouse look)
+- ✅ Basic terrain with height variation
+- ✅ Trees and rocks scattered around
+- ✅ FPS counter and position display
+- ✅ Pointer lock for mouse control
+- ✅ Build successful (678.73 kB / 181.56 kB gzipped)
 
 ## What Exists
 
