@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P14 — World Life (AI)** ✅ COMPLETE
+**P15 — Quests** ✅ COMPLETE
 
 ## What Exists
 
@@ -131,6 +131,18 @@
   - AI LOD (full/reduced/statistical based on distance)
   - Time-sliced updates (1.5ms/frame budget)
   - Priority-based update scheduling
+- **Quest System (P15):**
+  - Schema-validated quest graph (7 step types, choices, rewards)
+  - Dialogue system with reputation effects
+  - Journal system (quest tracking)
+  - Inventory and gear (items, equipment, stacking)
+  - Loot system (quest rewards, merchant inventory)
+  - Merchants with reputation-based pricing
+  - Crafting system (forge, cooking, alchemy)
+  - Persistent world flags (quest prerequisites, world state)
+  - 6 SLICE quests authored as data (Briarhollow starting area)
+  - Quest validator (no unreachable steps, no missing references)
+  - Headless quest bot (automated testing)
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -198,6 +210,13 @@
 - ✅ Faction reputation system tested
 - ✅ Event system tested (spawn, expire, active tracking)
 - ✅ AI tests pass (determinism, schedules, behavior trees)
+- ✅ Quest validator working (no unreachable steps, no missing references)
+- ✅ Quest bot completing quests automatically
+- ✅ Inventory system tested (items, equipment, stacking)
+- ✅ Crafting system tested (recipes, craft items)
+- ✅ Merchant system tested (reputation-based pricing)
+- ✅ World flags tested (set, unset, check, export/import)
+- ✅ Quest tests pass (management, steps, choices, rewards, requirements)
 
 ## Known Bugs
 
@@ -208,12 +227,14 @@
 
 ## Next Prompt
 
-**P15 — Quest System**
-- Quest definitions and tracking
-- Quest objectives and completion
-- Quest rewards
-- Quest UI and notifications
-- Integration with NPCs and events
+**P16 — UI System**
+- HUD (health, stamina, minimap)
+- Menus (main, pause, settings)
+- Dialogue UI
+- Quest log UI
+- Inventory UI
+- Crafting UI
+- Merchant UI
 
 ## Files Next Session Must Read
 
@@ -232,7 +253,8 @@
 13. `docs/COMBAT.md` (combat system documentation)
 14. `docs/SETTLEMENTS.md` (settlement system documentation)
 15. `docs/AI.md` (AI system documentation)
-16. `docs/design/GAMEPLAY.md`
+16. `docs/QUESTS.md` (quest system documentation)
+17. `docs/design/GAMEPLAY.md`
 14. `src/engine/characters/CharacterSystem.ts` (character orchestrator)
 15. `src/engine/characters/AnimationStateMachine.ts` (animation states)
 16. `src/engine/characters/Horse.ts` (horse system)
@@ -251,6 +273,20 @@
 29. `.depcruise.cjs`
 
 ## Session Notes
+
+- **P15 completed** - Quest system implemented
+  - Schema-validated quest graph with 7 step types
+  - Dialogue system with choices affecting reputation
+  - Journal system for quest tracking
+  - Inventory and gear system (items, equipment, stacking)
+  - Crafting system (forge, cooking, alchemy)
+  - Merchant system with reputation-based pricing
+  - Persistent world flags for quest prerequisites
+  - 6 SLICE quests authored as data (Briarhollow starting area)
+  - Quest validator (no unreachable steps, no missing references)
+  - Headless quest bot for automated testing
+  - Quest documentation at `docs/QUESTS.md`
+  - Quest tests passing (management, steps, choices, rewards, requirements)
 
 - **P14 completed** - World Life AI system implemented
   - NavMesh system using recast-navigation library

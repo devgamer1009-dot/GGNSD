@@ -1,0 +1,280 @@
+/**
+ * SLICE Quests - First 6 quests for Greenmarch
+ * P15 - Starting questline
+ */
+
+import { Quest, QuestStatus, QuestStepType } from './schema.js';
+
+export const SLICE_QUESTS: Quest[] = [
+  {
+    id: 'q1_wake_up',
+    name: 'A Knight\'s Awakening',
+    description: 'You awaken in Briarhollow with no memory of how you got here. Speak to the village elder.',
+    giverId: 'elder_bram',
+    status: QuestStatus.AVAILABLE,
+    steps: [
+      {
+        id: 'q1_step1',
+        type: QuestStepType.TALK_TO,
+        description: 'Speak to Elder Bram in Briarhollow',
+        target: 'elder_bram',
+        nextStepId: 'q1_step2',
+      },
+      {
+        id: 'q1_step2',
+        type: QuestStepType.CHOICE,
+        description: 'Listen to Elder Bram\'s story',
+        choices: [
+          {
+            id: 'q1_choice1',
+            text: 'I will help you, Elder.',
+            reputationChange: { villagers: 5 },
+            nextStepId: 'q1_step3',
+          },
+          {
+            id: 'q1_choice2',
+            text: 'What\'s in it for me?',
+            reputationChange: { villagers: -5 },
+            nextStepId: 'q1_step3',
+          },
+        ],
+      },
+      {
+        id: 'q1_step3',
+        type: QuestStepType.GO_TO,
+        description: 'Go to the village square',
+        target: 'briarhollow_square',
+      },
+    ],
+    currentStepId: 'q1_step1',
+    rewards: [
+      { type: 'xp', amount: 50 },
+      { type: 'gold', amount: 10 },
+    ],
+    setFlags: ['met_elder_bram', 'quest1_started'],
+  },
+  {
+    id: 'q2_wolves',
+    name: 'Wolf Problem',
+    description: 'Wolves have been attacking the village livestock. Hunt 3 wolves to protect the village.',
+    giverId: 'elder_bram',
+    status: QuestStatus.AVAILABLE,
+    requiredFlags: ['quest1_started'],
+    steps: [
+      {
+        id: 'q2_step1',
+        type: QuestStepType.TALK_TO,
+        description: 'Speak to Elder Bram about the wolf problem',
+        target: 'elder_bram',
+        nextStepId: 'q2_step2',
+      },
+      {
+        id: 'q2_step2',
+        type: QuestStepType.KILL,
+        description: 'Hunt 3 wolves in the forest',
+        target: 'wolf',
+        count: 3,
+        nextStepId: 'q2_step3',
+      },
+      {
+        id: 'q2_step3',
+        type: QuestStepType.TALK_TO,
+        description: 'Return to Elder Bram',
+        target: 'elder_bram',
+      },
+    ],
+    currentStepId: 'q2_step1',
+    rewards: [
+      { type: 'xp', amount: 100 },
+      { type: 'gold', amount: 25 },
+      { type: 'reputation', factionId: 'villagers', amount: 10 },
+    ],
+    setFlags: ['wolves_defeated'],
+  },
+  {
+    id: 'q3_lost_item',
+    name: 'The Lost Locket',
+    description: 'A villager has lost a precious locket. Search the area and return it to her.',
+    giverId: 'villager_martha',
+    status: QuestStatus.AVAILABLE,
+    steps: [
+      {
+        id: 'q3_step1',
+        type: QuestStepType.TALK_TO,
+        description: 'Speak to Martha about her lost locket',
+        target: 'villager_martha',
+        nextStepId: 'q3_step2',
+      },
+      {
+        id: 'q3_step2',
+        type: QuestStepType.GO_TO,
+        description: 'Search the riverbank where Martha lost the locket',
+        target: 'briarhollow_riverbank',
+        nextStepId: 'q3_step3',
+      },
+      {
+        id: 'q3_step3',
+        type: QuestStepType.COLLECT,
+        description: 'Pick up the golden locket',
+        target: 'golden_locket',
+        count: 1,
+        nextStepId: 'q3_step4',
+      },
+      {
+        id: 'q3_step4',
+        type: QuestStepType.DELIVER,
+        description: 'Return the locket to Martha',
+        target: 'villager_martha',
+      },
+    ],
+    currentStepId: 'q3_step1',
+    rewards: [
+      { type: 'xp', amount: 75 },
+      { type: 'gold', amount: 15 },
+      { type: 'reputation', factionId: 'villagers', amount: 5 },
+    ],
+  },
+  {
+    id: 'q4_blacksmith',
+    name: 'The Smith\'s Request',
+    description: 'The blacksmith needs iron ore to forge new weapons. Collect 5 iron ore from the mine.',
+    giverId: 'blacksmith_edric',
+    status: QuestStatus.AVAILABLE,
+    steps: [
+      {
+        id: 'q4_step1',
+        type: QuestStepType.TALK_TO,
+        description: 'Speak to Eadric the Blacksmith',
+        target: 'blacksmith_edric',
+        nextStepId: 'q4_step2',
+      },
+      {
+        id: 'q4_step2',
+        type: QuestStepType.COLLECT,
+        description: 'Collect 5 iron ore from the mine',
+        target: 'iron_ore',
+        count: 5,
+        nextStepId: 'q4_step3',
+      },
+      {
+        id: 'q4_step3',
+        type: QuestStepType.DELIVER,
+        description: 'Deliver the iron ore to Eadric',
+        target: 'blacksmith_edric',
+      },
+    ],
+    currentStepId: 'q4_step1',
+    rewards: [
+      { type: 'xp', amount: 100 },
+      { type: 'item', id: 'iron_sword', amount: 1 },
+      { type: 'reputation', factionId: 'villagers', amount: 10 },
+    ],
+  },
+  {
+    id: 'q5_bandits',
+    name: 'Bandit Threat',
+    description: 'Bandits have been raiding travelers on the road. Clear out their camp east of Briarhollow.',
+    giverId: 'guard_captain',
+    status: QuestStatus.AVAILABLE,
+    requiredFlags: ['wolves_defeated'],
+    steps: [
+      {
+        id: 'q5_step1',
+        type: QuestStepType.TALK_TO,
+        description: 'Speak to the Guard Captain about the bandits',
+        target: 'guard_captain',
+        nextStepId: 'q5_step2',
+      },
+      {
+        id: 'q5_step2',
+        type: QuestStepType.GO_TO,
+        description: 'Travel to the bandit camp east of Briarhollow',
+        target: 'bandit_camp',
+        nextStepId: 'q5_step3',
+      },
+      {
+        id: 'q5_step3',
+        type: QuestStepType.KILL,
+        description: 'Defeat 5 bandits',
+        target: 'bandit',
+        count: 5,
+        nextStepId: 'q5_step4',
+      },
+      {
+        id: 'q5_step4',
+        type: QuestStepType.KILL,
+        description: 'Defeat the bandit leader',
+        target: 'bandit_leader',
+        count: 1,
+        nextStepId: 'q5_step5',
+      },
+      {
+        id: 'q5_step5',
+        type: QuestStepType.TALK_TO,
+        description: 'Return to the Guard Captain',
+        target: 'guard_captain',
+      },
+    ],
+    currentStepId: 'q5_step1',
+    rewards: [
+      { type: 'xp', amount: 200 },
+      { type: 'gold', amount: 50 },
+      { type: 'reputation', factionId: 'guards', amount: 15 },
+    ],
+    setFlags: ['bandits_defeated'],
+  },
+  {
+    id: 'q6_merchant_guild',
+    name: 'The Merchant\'s Invitation',
+    description: 'A merchant from Goldacre has arrived with an invitation to join the Merchant Guild.',
+    giverId: 'merchant_guild_envoy',
+    status: QuestStatus.AVAILABLE,
+    requiredFlags: ['bandits_defeated'],
+    steps: [
+      {
+        id: 'q6_step1',
+        type: QuestStepType.TALK_TO,
+        description: 'Speak to the Merchant Guild Envoy',
+        target: 'merchant_guild_envoy',
+        nextStepId: 'q6_step2',
+      },
+      {
+        id: 'q6_step2',
+        type: QuestStepType.CHOICE,
+        description: 'Consider the Merchant Guild\'s offer',
+        choices: [
+          {
+            id: 'q6_choice1',
+            text: 'I accept your invitation.',
+            reputationChange: { merchants: 20, villagers: -5 },
+            nextStepId: 'q6_step3a',
+          },
+          {
+            id: 'q6_choice2',
+            text: 'I prefer to stay loyal to the village.',
+            reputationChange: { villagers: 10, merchants: -10 },
+            nextStepId: 'q6_step3b',
+          },
+        ],
+      },
+      {
+        id: 'q6_step3a',
+        type: QuestStepType.GO_TO,
+        description: 'Travel to Goldacre to meet the Guild Master',
+        target: 'goldacre',
+      },
+      {
+        id: 'q6_step3b',
+        type: QuestStepType.TALK_TO,
+        description: 'Return to Elder Bram and report the offer',
+        target: 'elder_bram',
+      },
+    ],
+    currentStepId: 'q6_step1',
+    rewards: [
+      { type: 'xp', amount: 150 },
+      { type: 'gold', amount: 30 },
+    ],
+    setFlags: ['merchant_guild_contacted'],
+  },
+];

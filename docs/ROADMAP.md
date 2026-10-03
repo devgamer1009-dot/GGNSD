@@ -24,7 +24,8 @@
 - [x] **P12** — Combat system (sword/shield, bow, spells, combos, block/parry, stamina, stagger, hit detection, enemy AI, visual feedback) ✅
 - [x] **P13** — Settlement system (deterministic generation, road network, plots, 10 building types, terrain flattening, interiors, landmarks) ✅
 - [x] **P14** — World Life AI (navmesh, behavior trees, NPC schedules, wildlife, factions, events, AI LOD, time-sliced updates) ✅
-- [ ] **P15** — Quest system (definitions, objectives, rewards, UI, notifications)
+- [x] **P15** — Quest system (schema-validated graph, dialogue, journal, inventory, crafting, merchants, world flags, 6 SLICE quests, validator, bot) ✅
+- [ ] **P16** — UI system (HUD, menus, dialogue UI, quest log, inventory, crafting, merchant UIs)
 
 ## Gameplay (P13–P17)
 

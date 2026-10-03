@@ -51,3 +51,6 @@ export * from './settlements/index.js';
 
 // AI module
 export * from './ai/index.js';
+
+// Quest module
+export * from './quests/index.js';
