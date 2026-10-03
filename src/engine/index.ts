@@ -21,3 +21,6 @@ export * from './render/index.js';
 
 // Terrain module
 export * from './terrain/index.js';
+
+// Streaming module
+export * from './streaming/index.js';

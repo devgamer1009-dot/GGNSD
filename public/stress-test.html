@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CrownFall Streaming Stress Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0f;
+      color: #e0d8c8;
+      font-family: 'Georgia', serif;
+      overflow: hidden;
+    }
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+    #ui {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 20px;
+      border-radius: 8px;
+      z-index: 1000;
+      min-width: 400px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    h1 {
+      font-size: 24px;
+      color: #c8a96e;
+      margin-bottom: 10px;
+    }
+    h2 {
+      font-size: 16px;
+      color: #c8a96e;
+      margin-top: 15px;
+      margin-bottom: 8px;
+    }
+    .stat {
+      font-size: 12px;
+      font-family: monospace;
+      margin: 3px 0;
+      color: #aaa;
+    }
+    .stat-value {
+      color: #4ade80;
+    }
+    button {
+      background: #c8a96e;
+      color: #0a0a0f;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      margin-top: 10px;
+      width: 100%;
+    }
+    button:hover { background: #d4b87a; }
+    button:disabled { background: #555; cursor: not-allowed; }
+    #summary {
+      margin-top: 15px;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      white-space: pre-wrap;
+      display: none;
+    }
+    .progress {
+      width: 100%;
+      height: 20px;
+      background: #333;
+      border-radius: 4px;
+      margin: 10px 0;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: #4ade80;
+      transition: width 0.3s;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+  <div id="ui">
+    <h1>Streaming Stress Test</h1>
+    <div class="stat">Status: <span id="status" class="stat-value">Ready</span></div>
+    <div class="stat">Progress: <span id="progress-text" class="stat-value">0%</span></div>
+    <div class="progress">
+      <div id="progress-bar" class="progress-bar" style="width: 0%"></div>
+    </div>
+    
+    <h2>Live Stats</h2>
+    <div class="stat">FPS: <span id="fps" class="stat-value">0</span></div>
+    <div class="stat">Frame Time: <span id="frame-time" class="stat-value">0ms</span></div>
+    <div class="stat">Hitches (>33ms): <span id="hitches" class="stat-value">0</span></div>
+    <div class="stat">Loaded Chunks: <span id="loaded-chunks" class="stat-value">0</span></div>
+    <div class="stat">Pending Requests: <span id="pending" class="stat-value">0</span></div>
+    <div class="stat">Busy Workers: <span id="busy-workers" class="stat-value">0</span></div>
+    
+    <h2>Memory</h2>
+    <div class="stat">Before: <span id="mem-before" class="stat-value">N/A</span></div>
+    <div class="stat">After: <span id="mem-after" class="stat-value">N/A</span></div>
+    <div class="stat">Delta: <span id="mem-delta" class="stat-value">N/A</span></div>
+    
+    <button id="start-btn">Start Fly-Through</button>
+    <div id="summary"></div>
+  </div>
+
+  <script type="module">
+    import { Renderer } from './src/engine/render/Renderer.js';
+    import { StreamingManager } from './src/engine/streaming/StreamingManager.js';
+    import * as THREE from 'three/webgpu';
+
+    // State
+    let renderer, streamingManager;
+    let scene, camera;
+    let running = false;
+    let startTime = 0;
+    let frameCount = 0;
+    let hitches = 0;
+    let lastFrameTime = 0;
+    let memBefore = 0;
+    let memAfter = 0;
+
+    // UI elements
+    const statusEl = document.getElementById('status');
+    const progressTextEl = document.getElementById('progress-text');
+    const progressBarEl = document.getElementById('progress-bar');
+    const fpsEl = document.getElementById('fps');
+    const frameTimeEl = document.getElementById('frame-time');
+    const hitchesEl = document.getElementById('hitches');
+    const loadedChunksEl = document.getElementById('loaded-chunks');
+    const pendingEl = document.getElementById('pending');
+    const busyWorkersEl = document.getElementById('busy-workers');
+    const memBeforeEl = document.getElementById('mem-before');
+    const memAfterEl = document.getElementById('mem-after');
+    const memDeltaEl = document.getElementById('mem-delta');
+    const startBtn = document.getElementById('start-btn');
+    const summaryEl = document.getElementById('summary');
+
+    // Initialize
+    async function init() {
+      const container = document.getElementById('canvas-container');
+
+      renderer = new Renderer({ antialias: true });
+      await renderer.init();
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87ceeb);
+
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
+      camera.position.set(0, 100, 0);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+      directionalLight.position.set(500, 1000, 500);
+      scene.add(directionalLight);
+
+      streamingManager = new StreamingManager(128, { full: 400, near: 800, far: 1600, unloaded: 2400 }, 12345, '1.0.0', 100);
+      await streamingManager.init();
+
+      const terrainMaterial = new THREE.MeshStandardMaterial({ vertexColors: true });
+
+      streamingManager.onChunkLoad = (chunkData) => {
+        const key = `${chunkData.chunkX},${chunkData.chunkZ},${chunkData.lod}`;
+        const existingMesh = streamingManager.getChunkMesh(chunkData.chunkX, chunkData.chunkZ, chunkData.lod);
+        if (existingMesh) {
+          scene.remove(existingMesh);
+          existingMesh.geometry.dispose();
+        }
+
+        const verticesPerSide = chunkData.resolution + 1;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(verticesPerSide * verticesPerSide * 3);
+        const colors = new Float32Array(verticesPerSide * verticesPerSide * 3);
+
+        for (let z = 0; z < verticesPerSide; z++) {
+          for (let x = 0; x < verticesPerSide; x++) {
+            const idx = z * verticesPerSide + x;
+            const vertIdx = idx * 3;
+            const worldX = chunkData.chunkX * chunkData.size + (x / chunkData.resolution) * chunkData.size - 2000;
+            const worldZ = chunkData.chunkZ * chunkData.size + (z / chunkData.resolution) * chunkData.size - 2000;
+            const worldY = chunkData.heights[idx] * 200;
+
+            positions[vertIdx] = worldX;
+            positions[vertIdx + 1] = worldY;
+            positions[vertIdx + 2] = worldZ;
+
+            const biome = chunkData.biomes[idx];
+            let r = 0.5, g = 0.5, b = 0.5;
+            if (biome === 0) { r = 0.1; g = 0.2; b = 0.5; }
+            else if (biome === 1) { r = 0.8; g = 0.7; b = 0.5; }
+            else if (biome === 2) { r = 0.4; g = 0.6; b = 0.2; }
+            else if (biome === 3) { r = 0.2; g = 0.4; b = 0.1; }
+            else if (biome === 4) { r = 0.5; g = 0.5; b = 0.3; }
+            else if (biome === 5) { r = 0.4; g = 0.4; b = 0.4; }
+            else if (biome === 6) { r = 0.9; g = 0.9; b = 0.95; }
+            else if (biome === 7) { r = 0.9; g = 0.8; b = 0.5; }
+
+            colors[vertIdx] = r;
+            colors[vertIdx + 1] = g;
+            colors[vertIdx + 2] = b;
+          }
+        }
+
+        const indices = [];
+        for (let z = 0; z < verticesPerSide - 1; z++) {
+          for (let x = 0; x < verticesPerSide - 1; x++) {
+            const topLeft = z * verticesPerSide + x;
+            const topRight = topLeft + 1;
+            const bottomLeft = (z + 1) * verticesPerSide + x;
+            const bottomRight = bottomLeft + 1;
+            indices.push(topLeft, bottomLeft, topRight);
+            indices.push(topRight, bottomLeft, bottomRight);
+          }
+        }
+
+        geometry.setIndex(indices);
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        geometry.computeVertexNormals();
+
+        const mesh = new THREE.Mesh(geometry, terrainMaterial);
+        scene.add(mesh);
+        streamingManager.setChunkMesh(chunkData.chunkX, chunkData.chunkZ, chunkData.lod, mesh);
+      };
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      renderer.setAnimationLoop(animate);
+    }
+
+    // Scripted fly-through path
+    const flyPath = [
+      { x: 0, z: 0, y: 100, duration: 0 },
+      { x: 500, z: 0, y: 150, duration: 5000 },
+      { x: 500, z: 500, y: 200, duration: 5000 },
+      { x: -500, z: 500, y: 150, duration: 5000 },
+      { x: -500, z: -500, y: 100, duration: 5000 },
+      { x: 0, z: -500, y: 150, duration: 5000 },
+      { x: 0, z: 0, y: 100, duration: 5000 },
+    ];
+
+    let pathIndex = 0;
+    let pathStartTime = 0;
+
+    function updateCamera(time) {
+      if (pathIndex >= flyPath.length - 1) return false;
+
+      const current = flyPath[pathIndex];
+      const next = flyPath[pathIndex + 1];
+      const elapsed = time - pathStartTime;
+      const progress = Math.min(elapsed / next.duration, 1);
+
+      camera.position.x = current.x + (next.x - current.x) * progress;
+      camera.position.z = current.z + (next.z - current.z) * progress;
+      camera.position.y = current.y + (next.y - current.y) * progress;
+
+      camera.lookAt(camera.position.x + 100, camera.position.y - 50, camera.position.z);
+
+      if (progress >= 1) {
+        pathIndex++;
+        pathStartTime = time;
+      }
+
+      return pathIndex < flyPath.length - 1;
+    }
+
+    function animate(time) {
+      const frameTime = time - lastFrameTime;
+      lastFrameTime = time;
+
+      if (running) {
+        frameCount++;
+        if (frameTime > 33) hitches++;
+
+        const continuing = updateCamera(time);
+        streamingManager.update(camera.position.x, camera.position.z);
+
+        const stats = streamingManager.getStats();
+        const progress = (pathIndex / (flyPath.length - 1)) * 100;
+
+        fpsEl.textContent = Math.round(1000 / frameTime);
+        frameTimeEl.textContent = frameTime.toFixed(2) + 'ms';
+        hitchesEl.textContent = hitches;
+        loadedChunksEl.textContent = stats.loadedChunks;
+        pendingEl.textContent = stats.pendingRequests;
+        busyWorkersEl.textContent = stats.busyWorkers;
+
+        progressTextEl.textContent = progress.toFixed(1) + '%';
+        progressBarEl.style.width = progress + '%';
+
+        if (!continuing) {
+          finishTest();
+        }
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    function startTest() {
+      if (running) return;
+
+      running = true;
+      frameCount = 0;
+      hitches = 0;
+      pathIndex = 0;
+      pathStartTime = performance.now();
+      startTime = performance.now();
+
+      memBefore = performance.memory?.usedJSHeapSize || 0;
+      memBeforeEl.textContent = (memBefore / 1024 / 1024).toFixed(2) + ' MB';
+
+      statusEl.textContent = 'Running';
+      startBtn.disabled = true;
+      summaryEl.style.display = 'none';
+    }
+
+    function finishTest() {
+      running = false;
+      const duration = performance.now() - startTime;
+
+      memAfter = performance.memory?.usedJSHeapSize || 0;
+      memAfterEl.textContent = (memAfter / 1024 / 1024).toFixed(2) + ' MB';
+      const memDelta = memAfter - memBefore;
+      memDeltaEl.textContent = (memDelta / 1024 / 1024).toFixed(2) + ' MB';
+
+      const stats = streamingManager.getStats();
+
+      const summary = {
+        timestamp: new Date().toISOString(),
+        duration: (duration / 1000).toFixed(2) + 's',
+        totalFrames: frameCount,
+        avgFps: Math.round(frameCount / (duration / 1000)),
+        hitches: hitches,
+        hitchRate: ((hitches / frameCount) * 100).toFixed(2) + '%',
+        memoryBefore: (memBefore / 1024 / 1024).toFixed(2) + ' MB',
+        memoryAfter: (memAfter / 1024 / 1024).toFixed(2) + ' MB',
+        memoryDelta: (memDelta / 1024 / 1024).toFixed(2) + ' MB',
+        finalStats: stats,
+      };
+
+      summaryEl.style.display = 'block';
+      summaryEl.textContent = JSON.stringify(summary, null, 2);
+
+      statusEl.textContent = 'Complete';
+      progressTextEl.textContent = '100%';
+      progressBarEl.style.width = '100%';
+      startBtn.disabled = false;
+    }
+
+    startBtn.addEventListener('click', startTest);
+
+    init().catch((err) => {
+      console.error('Init failed:', err);
+      statusEl.textContent = 'Error: ' + err.message;
+    });
+  </script>
+</body>
+</html>

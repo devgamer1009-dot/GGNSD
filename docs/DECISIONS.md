@@ -101,3 +101,33 @@
   - LOD switching at 200m, 400m, 800m, 1600m distances
   - Zero-copy typed array transfer from worker (heights, normals, biomes)
   - Shared heightAt(x,z) API works across all LOD levels
+
+## ADR-009: Streaming System Architecture
+
+- **Date:** P6
+- **Status:** Accepted
+- **Context:** Need efficient chunk streaming for large open world. Must handle priority loading, worker pooling, caching, and memory management.
+- **Decision:** Custom streaming system with priority queue, worker pool, IndexedDB cache, LRU eviction, and CellContentProvider interface.
+- **Key components:**
+  - **PriorityQueue**: Orders chunks by distance + velocity bonus
+  - **WorkerPool**: 4 workers with task cancellation support
+  - **ChunkCache**: IndexedDB with 7-day expiration
+  - **StreamingManager**: Orchestrates loading/unloading with time-sliced uploads
+  - **CellContentProvider**: Extensible interface for vegetation/NPCs/settlements
+- **Player-centered rings:**
+  - Full (400m): LOD 0, 128×128
+  - Near (800m): LOD 1, 64×64
+  - Far (1600m): LOD 2, 32×32
+  - Unloaded (2400m): LOD 3, 16×16, then unload
+- **Performance targets:**
+  - Max 2 GPU uploads per frame (time-sliced)
+  - Max 100 chunks in memory (LRU eviction)
+  - 4 concurrent worker tasks
+- **Alternatives considered:**
+  - Simple distance-based loading: No priority, no caching, poor performance
+  - Third-party streaming library: Less control, harder to integrate with custom ECS
+- **Consequences:**
+  - Smooth streaming with no frame hitches
+  - Efficient memory usage with bounded chunk count
+  - Extensible content system via CellContentProvider
+  - Persistent cache reduces regeneration on reload

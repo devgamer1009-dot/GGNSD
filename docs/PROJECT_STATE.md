@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P5 — Terrain** ✅ COMPLETE
+**P6 — Streaming** ✅ COMPLETE
 
 ## What Exists
 
@@ -38,7 +38,18 @@
   - Zero-copy typed array transfer from worker
   - Shared heightAt(x,z) API for rendering and physics
   - 128m chunk size (justified by memory/generation time balance)
+- **Streaming System (P6):**
+  - Player-centered rings (full: 400m, near: 800m, far: 1600m, unloaded: 2400m)
+  - Priority queue by distance and velocity
+  - Worker pool (4 workers) with task cancellation
+  - Time-sliced GPU uploads (2 chunks per frame)
+  - LRU eviction (max 100 chunks)
+  - IndexedDB cache (7-day expiration)
+  - CellContentProvider interface for vegetation/NPCs/settlements
+  - Floating-origin rebasing for precision
+  - Complete dispose of all resources
 - Test world: Free camera flying over 4x4km procedural terrain
+- Stress test page: `/stress-test.html` with scripted fly-through
 
 ## What Is Verified
 
@@ -74,7 +85,7 @@
 
 ## Next Prompt
 
-**P6 — Advanced Lighting & Shadows**
+**P7 — Advanced Lighting & Shadows**
 - Directional light with cascaded shadow maps
 - Ambient occlusion (screen-space or baked)
 - Dynamic time-of-day system
@@ -87,27 +98,35 @@
 2. `docs/ARCHITECTURE.md`
 3. `docs/CONVENTIONS.md`
 4. `docs/PERFORMANCE.md`
-5. `docs/DECISIONS.md` (ADR-006: renderer, ADR-007: ECS)
+5. `docs/DECISIONS.md` (ADR-006: renderer, ADR-007: ECS, ADR-008: chunk size)
 6. `docs/TERRAIN.md` (terrain system documentation)
-7. `docs/design/GAMEPLAY.md`
-8. `src/engine/terrain/TerrainSystem.ts`
-9. `src/engine/render/Renderer.ts`
-10. `src/engine/index.ts`
-11. `tsconfig.json`
-12. `.depcruise.cjs`
+7. `docs/STREAMING.md` (streaming system documentation)
+8. `docs/design/GAMEPLAY.md`
+9. `src/engine/streaming/StreamingManager.ts`
+10. `src/engine/terrain/TerrainSystem.ts`
+11. `src/engine/render/Renderer.ts`
+12. `src/engine/index.ts`
+13. `tsconfig.json`
+14. `.depcruise.cjs`
 
 ## Session Notes
 
-- P5 completed in ~25 tool calls (within 30 budget)
-- Terrain system fully implemented with Web Worker generation
-- 128m chunk size chosen based on memory/generation time balance
-- 4 LOD levels (128, 64, 32, 16 resolution) based on distance
-- Zero-copy typed array transfer from worker to main thread
-- 8 biomes determined by height and moisture
-- 5 region masks with influence falloff
-- Thermal erosion and river carving implemented
-- Free camera controls for testing (WASD + mouse look)
-- All terrain tests passing (determinism, heightAt, borders, biomes, regions)
+- P6 completed in ~28 tool calls (within 30 budget)
+- Streaming system fully implemented with all requested features:
+  - Player-centered rings (full: 400m, near: 800m, far: 1600m, unloaded: 2400m)
+  - Priority queue by distance and velocity
+  - Worker pool (4 workers) with task cancellation
+  - Time-sliced GPU uploads (2 chunks per frame)
+  - LRU eviction (max 100 chunks)
+  - IndexedDB cache (7-day expiration)
+  - CellContentProvider interface for vegetation/NPCs/settlements
+  - Floating-origin rebasing for precision
+  - Complete dispose of all resources
+- Stress test page created at `/stress-test.html`
+- Streaming documentation at `docs/STREAMING.md`
+- All streaming tests passing (priority queue ordering, dispose cleanup)
+- Updated worker to support task-based interface with cancellation
+- App.tsx updated to use StreamingManager instead of TerrainSystem
 - No images used (all procedural generation)
 - No TODO left behind
 - Renderer: Three.js WebGPURenderer with automatic WebGL2 fallback

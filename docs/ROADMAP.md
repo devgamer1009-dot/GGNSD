@@ -2,46 +2,45 @@
 
 > Phases P1–P24. Each phase = one session of work.
 
-## Foundation (P1–P5)
+## Foundation (P1–P4)
 
 - [x] **P1** — Project scaffold, tooling, docs, layer enforcement ✅
 - [x] **P2** — Design Bible (WORLD, GAMEPLAY, CONTENT_PLAN) ✅
 - [x] **P3** — Renderer + Benchmark (Three.js WebGPU + WebGL2 fallback, /bench.html) ✅
-- [ ] **P4** — Math library (Vec2, Vec3, Mat4, AABB, pools)
-- [ ] **P5** — ECS core (Entity, Component, System, World)
+- [x] **P4** — Engine Core (ECS, events, input, RNG, game loop, math, debug console) ✅
 
-## Rendering (P6–P9)
+## Rendering (P5–P8)
 
-- [ ] **P6** — Camera system (perspective, ortho, controls)
-- [x] **P7** — Procedural terrain generation (worker) ✅
-- [ ] **P8** — Advanced lighting (directional, ambient, shadows)
-- [ ] **P9** — Post-processing pipeline (bloom, tonemap)
+- [x] **P5** — Procedural terrain generation (worker, fBm, ridged, erosion, rivers, biomes, regions, LOD) ✅
+- [x] **P6** — Streaming system (priority queue, worker pool, time-sliced uploads, LRU, IndexedDB cache, CellContentProvider) ✅
+- [ ] **P7** — Advanced lighting (directional, ambient, shadows)
+- [ ] **P8** — Post-processing pipeline (bloom, tonemap)
 
-## World (P10–P13)
+## World (P9–P12)
 
-- [ ] **P10** — Chunk system (load/unload, streaming)
-- [ ] **P11** — Biome system (grassland, forest, desert, snow)
-- [ ] **P12** — Day/night cycle
-- [ ] **P13** — Weather system (rain, snow, fog)
+- [ ] **P9** — Camera system (perspective, ortho, controls)
+- [ ] **P10** — Day/night cycle
+- [ ] **P11** — Weather system (rain, snow, fog)
+- [ ] **P12** — Vegetation system (trees, grass, CellContentProvider)
 
-## Gameplay (P14–P18)
+## Gameplay (P13–P17)
 
-- [ ] **P14** — Player controller (movement, camera)
-- [ ] **P15** — Input system (keyboard, mouse, gamepad)
-- [ ] **P16** — NPC system (AI, pathfinding)
-- [ ] **P17** — Combat system (melee, ranged, damage)
-- [ ] **P18** — Inventory & items
+- [ ] **P13** — Player controller (movement, camera)
+- [ ] **P14** — NPC system (AI, pathfinding)
+- [ ] **P15** — Combat system (melee, ranged, damage)
+- [ ] **P16** — Inventory & items
+- [ ] **P17** — Quest system
 
-## UI & UX (P19–P21)
+## UI & UX (P18–P20)
 
-- [ ] **P19** — HUD (health, stamina, minimap)
-- [ ] **P20** — Menus (main, pause, settings)
-- [ ] **P21** — Dialog & quest system
+- [ ] **P18** — HUD (health, stamina, minimap)
+- [ ] **P19** — Menus (main, pause, settings)
+- [ ] **P20** — Dialog system
 
-## Polish (P22–P26)
+## Polish (P21–P25)
 
-- [ ] **P22** — Audio system (SFX, music, ambient)
-- [ ] **P23** — Save/Load system (IndexedDB, worker)
-- [ ] **P24** — Performance optimization pass
-- [ ] **P25** — Content creation (quests, NPCs, items)
-- [ ] **P26** — Beta release, bug fixes, balance
+- [ ] **P21** — Audio system (SFX, music, ambient)
+- [ ] **P22** — Save/Load system (IndexedDB, worker)
+- [ ] **P23** — Performance optimization pass
+- [ ] **P24** — Content creation (quests, NPCs, items)
+- [ ] **P25** — Beta release, bug fixes, balance
