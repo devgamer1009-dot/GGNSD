@@ -39,7 +39,8 @@
 - [x] **P21** — Boss system (multi-phase framework, telegraphs, arena, cinematics, Thornmother boss) ✅
 - [ ] **P22** — Performance optimization pass
 
-## Polish (P22–P23)
+## Polish (P22–P24)
 
 - [ ] **P22** — Performance optimization pass
 - [ ] **P23** — Beta release, bug fixes, balance
+- [x] **P24** — Release (production build, PWA, error reporting, deployment) ✅

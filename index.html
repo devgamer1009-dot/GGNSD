@@ -3,7 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="CrownFall - An open-world medieval fantasy RPG with procedural terrain, dynamic weather, and epic boss battles" />
+    <meta name="theme-color" content="#c8a96e" />
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    
     <title>CrownFall — Medieval Fantasy Open World</title>
+    
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body, #root {
@@ -14,10 +23,99 @@
         color: #e0d8c8;
         font-family: 'Georgia', serif;
       }
+      
+      /* Loading screen */
+      #loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #0a0a0f;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      
+      #loading h1 {
+        color: #c8a96e;
+        font-size: 48px;
+        margin-bottom: 20px;
+      }
+      
+      #loading p {
+        color: #e0d8c8;
+        font-size: 18px;
+      }
+      
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #333;
+        border-top-color: #c8a96e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-top: 20px;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
     </style>
   </head>
   <body>
+    <div id="loading">
+      <h1>CrownFall</h1>
+      <p>Loading...</p>
+      <div class="spinner"></div>
+    </div>
+    
     <div id="root"></div>
+    
     <script type="module" src="/src/main.tsx"></script>
+    
+    <script>
+      // Register Service Worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('[PWA] Service Worker registered:', registration.scope);
+              
+              // Check for updates
+              registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                console.log('[PWA] Service Worker update found');
+                
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    // New version available
+                    if (confirm('New version available! Reload to update?')) {
+                      window.location.reload();
+                    }
+                  }
+                });
+              });
+            })
+            .catch((error) => {
+              console.error('[PWA] Service Worker registration failed:', error);
+            });
+        });
+      }
+      
+      // Hide loading screen when app is ready
+      window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          const loading = document.getElementById('loading');
+          if (loading) {
+            loading.style.opacity = '0';
+            loading.style.transition = 'opacity 0.5s';
+            setTimeout(() => loading.remove(), 500);
+          }
+        }, 1000);
+      });
+    </script>
   </body>
 </html>

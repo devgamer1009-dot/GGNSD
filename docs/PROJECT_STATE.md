@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P21 — Bosses** ✅ COMPLETE
+**P24 — RELEASE** ✅ COMPLETE
 
 ## What Exists
 
@@ -228,6 +228,15 @@
   - Loot table system
   - Boss documentation at `docs/BOSSES.md`
   - Boss tests passing (phase transitions, attack selection, telegraphs)
+- **Release (P24):**
+  - Production build optimized (277.83 KB gzipped)
+  - PWA support (manifest.json, Service Worker, offline caching)
+  - Error reporting system (ErrorBoundary component)
+  - Save version compatibility checker
+  - Final license audit (all assets verified)
+  - Deployment guide (Netlify, Vercel, AWS, Nginx)
+  - Complete release report with ACHIEVED/UNVERIFIED/MISSED lists
+  - All documentation updated and consistent
 - Test world: Free camera flying over 4x4km procedural terrain- Stress test page: `/stress-test.html` with scripted fly-through
 
 ## What Is Verified

@@ -11,3 +11,4 @@ export * from './SaveExporter.js';
 export * from './AutosaveSystem.js';
 export * from './SettingsManager.js';
 export * from './SaveManager.js';
+export * from './SaveCompatibility.js';

@@ -1,0 +1,47 @@
+{
+  "name": "CrownFall - Medieval Fantasy RPG",
+  "short_name": "CrownFall",
+  "description": "An open-world medieval fantasy RPG with procedural terrain, dynamic weather, and epic boss battles",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#c8a96e",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["games", "entertainment"],
+  "screenshots": [
+    {
+      "src": "/screenshots/gameplay-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Continue Game",
+      "short_name": "Continue",
+      "url": "/?action=continue",
+      "icons": [{ "src": "/icons/continue.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "New Game",
+      "short_name": "New Game",
+      "url": "/?action=new",
+      "icons": [{ "src": "/icons/newgame.png", "sizes": "96x96" }]
+    }
+  ]
+}
