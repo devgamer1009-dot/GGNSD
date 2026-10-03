@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P13 — Settlements** ✅ COMPLETE
+**P14 — World Life (AI)** ✅ COMPLETE
 
 ## What Exists
 
@@ -121,6 +121,16 @@
   - Authored landmarks (Highspire castle, Briarhollow village)
   - Integration with streaming via CellContentProvider
   - Schema-validated settlement data
+- **AI System (P14):**
+  - NavMesh system (recast-navigation, per-chunk generation)
+  - Behavior trees (sequence, selector, action, condition, inverter, repeater)
+  - NPC schedules (time-based activities: work, eat, sleep, socialize)
+  - Wildlife system (herds, predators, prey, weather reactions)
+  - Faction system (reputation tracking, relations)
+  - Dynamic events (bandit raids, merchant caravans, wolf attacks)
+  - AI LOD (full/reduced/statistical based on distance)
+  - Time-sliced updates (1.5ms/frame budget)
+  - Priority-based update scheduling
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -181,6 +191,13 @@
 - ✅ No overlapping plots (collision detection)
 - ✅ Slope limit validation working
 - ✅ Settlement tests pass (determinism, validation, meshes)
+- ✅ AI schedule logic tested (time progression, activities)
+- ✅ Behavior tree execution tested (sequence, selector, actions)
+- ✅ AI LOD levels working (distance-based)
+- ✅ Time-sliced updates tested (budget enforcement)
+- ✅ Faction reputation system tested
+- ✅ Event system tested (spawn, expire, active tracking)
+- ✅ AI tests pass (determinism, schedules, behavior trees)
 
 ## Known Bugs
 
@@ -191,12 +208,12 @@
 
 ## Next Prompt
 
-**P14 — NPC System**
-- NPC spawning and lifecycle
-- Dialogue system
-- Quest system
-- NPC schedules and routines
-- Integration with combat and movement
+**P15 — Quest System**
+- Quest definitions and tracking
+- Quest objectives and completion
+- Quest rewards
+- Quest UI and notifications
+- Integration with NPCs and events
 
 ## Files Next Session Must Read
 
@@ -214,7 +231,8 @@
 12. `docs/CHARACTERS.md` (character system documentation)
 13. `docs/COMBAT.md` (combat system documentation)
 14. `docs/SETTLEMENTS.md` (settlement system documentation)
-15. `docs/design/GAMEPLAY.md`
+15. `docs/AI.md` (AI system documentation)
+16. `docs/design/GAMEPLAY.md`
 14. `src/engine/characters/CharacterSystem.ts` (character orchestrator)
 15. `src/engine/characters/AnimationStateMachine.ts` (animation states)
 16. `src/engine/characters/Horse.ts` (horse system)
@@ -233,6 +251,18 @@
 29. `.depcruise.cjs`
 
 ## Session Notes
+
+- **P14 completed** - World Life AI system implemented
+  - NavMesh system using recast-navigation library
+  - Behavior tree system (sequence, selector, action, condition, inverter, repeater, random)
+  - NPC schedule system (time-based activities: sleep, work, eat, socialize, wander)
+  - Wildlife system (herds, predators, prey, weather reactions, alertness)
+  - Faction system (reputation tracking, relations: hostile/neutral/friendly)
+  - Dynamic event system (bandit raids, merchant caravans, wolf attacks)
+  - AI LOD manager (full/reduced/statistical based on distance)
+  - Time-sliced update scheduler (1.5ms/frame budget, priority-based)
+  - AI documentation at `docs/AI.md`
+  - AI tests passing (schedules, behavior trees, LOD, factions, events, determinism)
 
 - **P13 completed** - Settlement system implemented
   - Deterministic settlement generation with seeded RNG

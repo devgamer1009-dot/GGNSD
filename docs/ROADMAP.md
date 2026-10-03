@@ -23,7 +23,8 @@
 - [x] **P11** — Character system (GPU skinning, animation state machine, procedural humanoid, horse with gaits, mount/dismount, rider camera, instanced crowds) ✅
 - [x] **P12** — Combat system (sword/shield, bow, spells, combos, block/parry, stamina, stagger, hit detection, enemy AI, visual feedback) ✅
 - [x] **P13** — Settlement system (deterministic generation, road network, plots, 10 building types, terrain flattening, interiors, landmarks) ✅
-- [ ] **P14** — NPC system (spawning, dialogue, quests, schedules)
+- [x] **P14** — World Life AI (navmesh, behavior trees, NPC schedules, wildlife, factions, events, AI LOD, time-sliced updates) ✅
+- [ ] **P15** — Quest system (definitions, objectives, rewards, UI, notifications)
 
 ## Gameplay (P13–P17)
 
