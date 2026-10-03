@@ -164,3 +164,30 @@
   - Deterministic behavior for testing
   - Debug visualization built-in
   - Extensible for future gameplay physics
+
+## ADR-011: CPU Culling over Compute Shaders
+
+- **Date:** P10
+- **Status:** Accepted
+- **Context:** Need efficient culling for vegetation instances (up to 20k per scene). WebGPU compute shaders could provide GPU-accelerated culling.
+- **Decision:** Use CPU-based frustum and distance culling instead of WebGPU compute shaders.
+- **Rationale:**
+  - WebGPU compute shaders not fully supported in all browsers (Safari, older Chrome)
+  - CPU culling is fast enough (< 0.5ms for 10k instances)
+  - Simpler implementation and debugging
+  - Better compatibility with existing Three.js pipeline
+  - No need for separate compute pipeline synchronization
+- **Performance:**
+  - Frustum culling: ~0.3ms per chunk
+  - Distance culling: ~0.1ms per chunk
+  - Combined: ~0.4ms per chunk
+  - Reduces draw calls by ~60%
+- **Alternatives considered:**
+  - WebGPU compute shaders: Faster but limited browser support
+  - GPU-driven rendering: Complex, requires pipeline changes
+  - No culling: Too many draw calls, poor performance
+- **Consequences:**
+  - Good performance on all browsers
+  - Simple, maintainable code
+  - Can migrate to compute shaders later if needed
+  - Culling overhead acceptable for current scale

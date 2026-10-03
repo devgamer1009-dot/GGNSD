@@ -36,3 +36,6 @@ export * from './physics/index.js';
 
 // Camera module
 export * from './camera/index.js';
+
+// Vegetation module
+export * from './vegetation/index.js';

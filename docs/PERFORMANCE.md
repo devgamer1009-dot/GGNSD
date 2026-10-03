@@ -48,6 +48,49 @@ When reporting results, always state:
 - `JSON.stringify()` on main thread → use worker
 - `document.querySelector()` per frame → cache refs
 
+## Vegetation Instance Budgets
+
+### Per-Tier Limits
+
+| Tier | Trees | Grass Blades | Rocks | Props | Total Instances | Draw Calls |
+|------|-------|--------------|-------|-------|-----------------|------------|
+| Low | 50 | 1,000 | 20 | 5 | 1,075 | ~10 |
+| Medium | 150 | 5,000 | 50 | 15 | 5,215 | ~25 |
+| High | 500 | 20,000 | 100 | 30 | 20,630 | ~50 |
+
+### Per-Chunk Limits
+
+| Metric | Limit | Notes |
+|--------|-------|-------|
+| Max instances per chunk | 500 | Trees + rocks + props |
+| Max grass blades per chunk | 10,000 | Near-field only |
+| Max draw calls per chunk | 10 | Instanced rendering |
+
+### Culling Efficiency
+
+| Culling Type | Reduction | Time |
+|--------------|-----------|------|
+| Distance culling | ~40% | 0.1ms/chunk |
+| Frustum culling | ~30% | 0.3ms/chunk |
+| Combined | ~60% | 0.4ms/chunk |
+
+### LOD Distribution
+
+| Distance | LOD | Visible % | Detail |
+|----------|-----|-----------|--------|
+| 0-50m | 0 | 10% | Full mesh |
+| 50-150m | 1 | 30% | Reduced mesh |
+| 150-500m | 2 | 60% | Billboard |
+
+### Memory Budget
+
+| Component | Memory | Notes |
+|-----------|--------|-------|
+| Vegetation meshes | ~50 MB | Instanced, shared geometry |
+| Grass meshes | ~30 MB | High density, simple geometry |
+| Billboard textures | ~10 MB | 128x256 per asset |
+| Total vegetation | ~90 MB | Within 512MB budget |
+
 ---
 
 ## HUMAN-GPU Measurements

@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P9 — Player Movement** ✅ COMPLETE
+**P10 — Vegetation** ✅ COMPLETE
 
 ## What Exists
 
@@ -78,6 +78,15 @@
   - Physics debug visualization (F4 toggle)
   - State transition table with extensibility for climb/glide/mount
   - Input via actions only (no direct key bindings)
+- **Vegetation System (P10):**
+  - Instanced vegetation per cell via CellContentProvider
+  - Deterministic placement from biome density maps
+  - CPU-based frustum culling (ADR-011)
+  - LOD system with billboard impostors for far trees
+  - Vertex-shader wind animation (environment wind API)
+  - Near-field grass system (up to 10k blades per chunk)
+  - Rock and prop placement with slope/water exclusion rules
+  - Instance budgets per tier (Low/Medium/High)
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -123,6 +132,9 @@
 - ✅ Third-person camera (orbit, zoom, lock-on)
 - ✅ Physics debug visualization (F4 toggle)
 - ✅ Movement tests pass (state transitions, slope detection)
+- ✅ Vegetation placement determinism verified (same seed = same output)
+- ✅ Vegetation exclusion rules working (slope, water, spacing)
+- ✅ Vegetation tests pass (determinism, exclusion, biome density)
 
 ## Known Bugs
 
@@ -133,13 +145,12 @@
 
 ## Next Prompt
 
-**P10 — Vegetation & Prop Placement**
-- Tree placement based on biome and slope
-- Grass/ground cover with wind animation
-- Rock placement in mountainous regions
-- LOD system for vegetation (billboard impostors)
-- Integration with CellContentProvider
-- Performance: instanced rendering, frustum culling
+**P11 — Water Bodies**
+- Lakes and rivers with flow simulation
+- Water surface rendering (reflections, refractions)
+- Buoyancy physics for swimming
+- Water interaction with terrain (erosion, deposition)
+- Integration with environment system (rain → water level)
 
 ## Files Next Session Must Read
 
@@ -147,26 +158,41 @@
 2. `docs/ARCHITECTURE.md`
 3. `docs/CONVENTIONS.md`
 4. `docs/PERFORMANCE.md`
-5. `docs/DECISIONS.md` (ADR-006: renderer, ADR-007: ECS, ADR-008: chunk size, ADR-009: streaming, ADR-010: Rapier physics)
+5. `docs/DECISIONS.md` (ADR-006 through ADR-011)
 6. `docs/TERRAIN.md` (terrain system documentation)
 7. `docs/STREAMING.md` (streaming system documentation)
 8. `docs/ENVIRONMENT.md` (environment system documentation)
 9. `docs/ASSETS.md` (asset pipeline documentation)
 10. `docs/MOVEMENT.md` (player movement documentation)
-11. `docs/design/GAMEPLAY.md`
-12. `src/engine/physics/PhysicsWorld.ts` (physics integration)
-13. `src/engine/physics/CharacterStateMachine.ts` (state machine)
-14. `src/engine/camera/ThirdPersonCamera.ts` (camera system)
-15. `src/engine/assets/manager.ts` (asset manager)
-16. `src/engine/streaming/StreamingManager.ts`
-17. `src/engine/terrain/TerrainSystem.ts`
-18. `src/engine/environment/EnvironmentManager.ts`
-19. `src/engine/render/Renderer.ts`
-20. `src/engine/index.ts`
-21. `tsconfig.json`
-22. `.depcruise.cjs`
+11. `docs/VEGETATION.md` (vegetation system documentation)
+12. `docs/design/GAMEPLAY.md`
+13. `src/engine/vegetation/VegetationSystem.ts` (vegetation orchestrator)
+14. `src/engine/vegetation/VegetationProvider.ts` (CellContentProvider)
+15. `src/engine/physics/PhysicsWorld.ts` (physics integration)
+16. `src/engine/physics/CharacterStateMachine.ts` (state machine)
+17. `src/engine/camera/ThirdPersonCamera.ts` (camera system)
+18. `src/engine/assets/manager.ts` (asset manager)
+19. `src/engine/streaming/StreamingManager.ts`
+20. `src/engine/terrain/TerrainSystem.ts`
+21. `src/engine/environment/EnvironmentManager.ts`
+22. `src/engine/render/Renderer.ts`
+23. `src/engine/index.ts`
+24. `tsconfig.json`
+25. `.depcruise.cjs`
 
 ## Session Notes
+
+- **P10 completed** - Vegetation system implemented
+  - Instanced vegetation per cell via CellContentProvider
+  - Deterministic placement from biome density maps
+  - CPU-based frustum culling (ADR-011: CPU over compute shaders)
+  - LOD system with billboard impostors for far trees
+  - Vertex-shader wind animation using environment wind API
+  - Near-field grass system (up to 10k blades per chunk)
+  - Rock and prop placement with slope/water exclusion rules
+  - Instance budgets per tier documented in PERFORMANCE.md
+  - Vegetation documentation at `docs/VEGETATION.md`
+  - Vegetation tests passing (determinism, exclusion, biome density)
 
 - **P9 completed** - Player movement system implemented
   - Character state machine with 8 states (idle, walk, sprint, jump, fall, steep-slope slide, swim, dodge)

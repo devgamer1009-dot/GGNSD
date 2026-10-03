@@ -19,8 +19,8 @@
 ## World (P9–P12)
 
 - [x] **P9** — Player movement (character state machine, Rapier physics, heightfield colliders, third-person camera, lock-on, debug visualization) ✅
-- [ ] **P10** — Vegetation & prop placement (biome-based, wind animation, instancing, CellContentProvider)
-- [ ] **P11** — Water bodies (lakes, rivers with flow)
+- [x] **P10** — Vegetation system (instanced placement, biome density, LOD + billboards, wind shader, culling, grass, rocks/props) ✅
+- [ ] **P11** — Water bodies (lakes, rivers with flow, buoyancy)
 - [ ] **P12** — Structure placement (buildings, ruins, waypoints)
 
 ## Gameplay (P13–P17)
