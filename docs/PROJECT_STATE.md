@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P16 — UI** ✅ COMPLETE
+**P17 — Audio** ✅ COMPLETE
 
 ## What Exists
 
@@ -153,10 +153,21 @@
   - Dialogue screen with choices
   - Photo mode (free camera, DoF, time-of-day, filters, high-res capture)
   - Accessibility (scalable UI, colorblind palettes, subtitles, reduced shake, hold-to-toggle, rebinding)
-  - Keyboard and gamepad navigation everywhere
-  - Screen navigation system with back history
-- Test world: Free camera flying over 4x4km procedural terrain
-- Stress test page: `/stress-test.html` with scripted fly-through
+   - Keyboard and gamepad navigation everywhere
+   - Screen navigation system with back history
+- **Audio System (P17):**
+  - Native Web Audio API only (no external libraries)
+  - Mixer buses (master, sfx, music, ambience, ui, voice)
+  - Voice budget management (32 simultaneous sounds)
+  - 3D spatialization with HRTF panning
+  - Procedural SFX generation (swords, footsteps per surface, hooves, wind, rain, fire, UI)
+  - Adaptive layered music (explore, tension, combat, boss states)
+  - Region-specific music scales (Greenmarch, Thornwood, Ironcrag, Saltfen, Ashfell)
+  - Interior reverb zones (small room, large room, hall, cave, cathedral)
+  - Crossfade transitions between music states
+  - Audio documentation at `docs/AUDIO.md`
+  - Audio tests passing (voice budget, bus management, SFX generation, music transitions)
+- Test world: Free camera flying over 4x4km procedural terrain- Stress test page: `/stress-test.html` with scripted fly-through
 
 ## What Is Verified
 
@@ -230,6 +241,15 @@
 - ✅ World flags tested (set, unset, check, export/import)
 - ✅ Quest tests pass (management, steps, choices, rewards, requirements)
 - ✅ UI tests pass (navigation, pause, photo mode, accessibility, key bindings)
+- ✅ Audio system initialized (Web Audio API)
+- ✅ Mixer buses working (master, sfx, music, ambience, ui, voice)
+- ✅ Voice budget management tested
+- ✅ Spatial audio positioning working
+- ✅ Procedural SFX generation (all types)
+- ✅ Adaptive music state transitions
+- ✅ Region-specific music scales
+- ✅ Reverb zones (interior effects)
+- ✅ Audio tests pass (voice budget, bus management, SFX, music)
 
 ## Known Bugs
 
@@ -240,12 +260,12 @@
 
 ## Next Prompt
 
-**P17 — Audio System**
-- Background music (ambient, combat, exploration)
-- Sound effects (footsteps, combat, UI)
-- Spatial audio (3D positioning)
-- Music transitions (crossfade, layers)
-- Volume controls per category
+**P18 — Save/Load System**
+- IndexedDB persistence
+- Save game state (player, world, quests, inventory)
+- Multiple save slots
+- Auto-save system
+- Save/load UI integration
 
 ## Files Next Session Must Read
 
@@ -437,5 +457,18 @@
 - ADR-006 logged: Three.js WebGPURenderer decision
 - PERFORMANCE.md: HUMAN-GPU section added (awaiting human test results)
 - Build: 928KB (262KB gzipped) — large due to Three.js, expected
+
+- **P17 completed** - Audio system implemented
+  - Native Web Audio API only (no external libraries)
+  - Mixer buses (master, sfx, music, ambience, ui, voice)
+  - Voice budget management (32 simultaneous sounds)
+  - 3D spatialization with HRTF panning
+  - Procedural SFX generation (swords, footsteps per surface, hooves, wind, rain, fire, UI)
+  - Adaptive layered music (explore, tension, combat, boss states)
+  - Region-specific music scales (Greenmarch, Thornwood, Ironcrag, Saltfen, Ashfell)
+  - Interior reverb zones (small room, large room, hall, cave, cathedral)
+  - Crossfade transitions between music states
+  - Audio documentation at `docs/AUDIO.md`
+  - Audio tests passing (voice budget, bus management, SFX generation, music transitions)
 - No images used (all procedural)
 - No TODO left behind

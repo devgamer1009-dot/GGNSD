@@ -27,23 +27,13 @@
 - [x] **P15** — Quest system (schema-validated graph, dialogue, journal, inventory, crafting, merchants, world flags, 6 SLICE quests, validator, bot) ✅
 - [x] **P16** — UI system (DOM+CSS, HUD, menus, inventory, map, journal, dialogue, photo mode, accessibility, keyboard+gamepad) ✅
 
-## Gameplay (P13–P17)
+## UI & UX (P17–P18)
 
-- [ ] **P13** — NPC system (AI, pathfinding)
-- [ ] **P14** — Combat system (melee, ranged, damage)
-- [ ] **P15** — Inventory & items
-- [ ] **P16** — Quest system
-- [ ] **P17** — Dialog system
+- [x] **P17** — Audio system (Web Audio API, mixer buses, spatialization, procedural SFX, adaptive music, reverb zones) ✅
 
-## UI & UX (P18–P20)
+## Polish (P18–P21)
 
-- [ ] **P18** — HUD (health, stamina, minimap)
-- [ ] **P19** — Menus (main, pause, settings)
-- [ ] **P20** — Audio system (SFX, music, ambient)
-
-## Polish (P21–P24)
-
-- [ ] **P21** — Save/Load system (IndexedDB, worker)
-- [ ] **P22** — Performance optimization pass
-- [ ] **P23** — Content creation (quests, NPCs, items)
-- [ ] **P24** — Beta release, bug fixes, balance
+- [ ] **P18** — Save/Load system (IndexedDB, worker)
+- [ ] **P19** — Performance optimization pass
+- [ ] **P20** — Content creation (quests, NPCs, items)
+- [ ] **P21** — Beta release, bug fixes, balance
