@@ -4,6 +4,7 @@
  */
 
 export * from './CombatState.js';
+export * from './CombatStateManager.js';
 export * from './DamageSystem.js';
 export * from './InputBuffer.js';
 export * from './HitDetection.js';

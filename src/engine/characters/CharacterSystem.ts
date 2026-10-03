@@ -8,6 +8,7 @@ import { AnimationStateMachine } from './AnimationStateMachine.js';
 import { Horse } from './Horse.js';
 import { MountSystem, MountState } from './MountSystem.js';
 import { RiderCamera } from './RiderCamera.js';
+import { HorseManager } from './HorseManager.js';
 import { CrowdSystem, createCrowdGeometry, createCrowdMaterial } from './CrowdSystem.js';
 import { CharacterState } from '../physics/CharacterStateMachine.js';
 
@@ -36,10 +37,8 @@ export class CharacterSystem {
   private animationStateMachine: AnimationStateMachine;
   private mountSystem: MountSystem;
   private riderCamera: RiderCamera;
+  private horseManager: HorseManager;
   private crowdSystem: CrowdSystem | null = null;
-  
-  private horses: Map<string, Horse> = new Map();
-  private playerHorseId: string | null = null;
 
   constructor(
     scene: THREE.Scene,
@@ -53,6 +52,7 @@ export class CharacterSystem {
     this.animationStateMachine = new AnimationStateMachine();
     this.mountSystem = new MountSystem();
     this.riderCamera = new RiderCamera(camera);
+    this.horseManager = new HorseManager(scene, this.mountSystem, this.config.maxHorses);
     
     if (this.config.enableCrowds) {
       this.crowdSystem = new CrowdSystem({
@@ -88,38 +88,22 @@ export class CharacterSystem {
     }
     
     // Update horses
-    for (const [id, horse] of this.horses.entries()) {
-      const isPlayerHorse = id === this.playerHorseId;
-      
-      if (isPlayerHorse && mountResult.state === MountState.MOUNTED) {
-        // Player-controlled horse
-        horse.update(deltaTime, input);
-        
-        // Update rider camera
-        const horseState = horse.getState();
+    this.horseManager.update(deltaTime, input);
+    
+    // Update rider camera if mounted
+    if (mountResult.state === MountState.MOUNTED) {
+      const playerHorse = this.horseManager.getPlayerHorse();
+      if (playerHorse) {
+        const horseState = playerHorse.getState();
         this.riderCamera.update(
           deltaTime,
-          horse.getRiderPosition(),
+          playerHorse.getRiderPosition(),
           horseState.rotation,
-          new THREE.Vector3(0, 0, 0) // Velocity from horse
+          new THREE.Vector3(0, 0, 0)
         );
-      } else {
-        // NPC horse (simple AI)
-        horse.update(deltaTime, { moveX: 0, moveZ: 0, sprint: false });
-      }
-    }
-    
-    // Update crowd
-    if (this.crowdSystem) {
-      this.crowdSystem.update(deltaTime);
-    }
-    
-    // Switch camera mode based on mount state
-    if (mountResult.state === MountState.MOUNTED) {
-      if (!this.riderCamera.isActiveMode()) {
-        const horse = this.horses.get(this.playerHorseId!);
-        if (horse) {
-          this.riderCamera.activate(horse.getRiderPosition(), horse.getState().rotation);
+        
+        if (!this.riderCamera.isActiveMode()) {
+          this.riderCamera.activate(playerHorse.getRiderPosition(), horseState.rotation);
         }
       }
     } else {
@@ -127,60 +111,33 @@ export class CharacterSystem {
         this.riderCamera.deactivate();
       }
     }
+    
+    // Update crowd
+    if (this.crowdSystem) {
+      this.crowdSystem.update(deltaTime);
+    }
   }
 
   /**
    * Try to mount nearest horse
    */
   private tryMountNearestHorse(): void {
-    const mountables = Array.from(this.horses.values());
     const playerPos = this.mountSystem['playerPosition']; // Access private for now
-    
-    const mounted = this.mountSystem.tryMount(mountables, playerPos);
-    if (mounted) {
-      // Find horse ID
-      for (const [id, horse] of this.horses.entries()) {
-        if (horse === mounted) {
-          this.playerHorseId = id;
-          break;
-        }
-      }
-    }
+    this.horseManager.tryMountNearestHorse(playerPos);
   }
 
   /**
    * Add a horse to the system
    */
   addHorse(id: string, position: THREE.Vector3, rotation: number = 0): Horse {
-    if (this.horses.size >= this.config.maxHorses) {
-      throw new Error('Maximum horse count reached');
-    }
-    
-    const horse = new Horse();
-    horse.setPosition(position.x, position.y, position.z);
-    horse.setRotation(rotation);
-    
-    this.horses.set(id, horse);
-    this.scene.add(horse.getMesh());
-    
-    return horse;
+    return this.horseManager.addHorse(id, position, rotation);
   }
 
   /**
    * Remove a horse from the system
    */
   removeHorse(id: string): void {
-    const horse = this.horses.get(id);
-    if (horse) {
-      this.scene.remove(horse.getMesh());
-      horse.dispose();
-      this.horses.delete(id);
-      
-      if (this.playerHorseId === id) {
-        this.playerHorseId = null;
-        this.mountSystem.forceDismount();
-      }
-    }
+    this.horseManager.removeHorse(id);
   }
 
   /**
@@ -229,29 +186,28 @@ export class CharacterSystem {
    * Get horse by ID
    */
   getHorse(id: string): Horse | undefined {
-    return this.horses.get(id);
+    return this.horseManager.getHorse(id);
   }
 
   /**
    * Get all horses
    */
   getAllHorses(): Map<string, Horse> {
-    return this.horses;
+    return this.horseManager.getAllHorses();
   }
 
   /**
    * Check if player is mounted
    */
   isPlayerMounted(): boolean {
-    return this.mountSystem.isMounted();
+    return this.horseManager.isPlayerMounted();
   }
 
   /**
    * Get player's current horse
    */
   getPlayerHorse(): Horse | null {
-    if (!this.playerHorseId) return null;
-    return this.horses.get(this.playerHorseId) ?? null;
+    return this.horseManager.getPlayerHorse();
   }
 
   /**
@@ -264,7 +220,7 @@ export class CharacterSystem {
     currentAnimation: string;
   } {
     return {
-      horseCount: this.horses.size,
+      horseCount: this.horseManager.getHorseCount(),
       crowdCount: this.crowdSystem?.getMemberCount() ?? 0,
       isMounted: this.mountSystem.isMounted(),
       currentAnimation: this.animationStateMachine.getCurrentState(),
@@ -276,11 +232,7 @@ export class CharacterSystem {
    */
   dispose(): void {
     // Dispose horses
-    for (const horse of this.horses.values()) {
-      this.scene.remove(horse.getMesh());
-      horse.dispose();
-    }
-    this.horses.clear();
+    this.horseManager.dispose();
     
     // Dispose crowd
     if (this.crowdSystem) {

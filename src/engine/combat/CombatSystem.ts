@@ -4,7 +4,7 @@
  */
 
 import * as THREE from 'three';
-import { CombatStateComponent } from './CombatState.js';
+import { CombatStateManager } from './CombatStateManager.js';
 import { DamageSystem } from './DamageSystem.js';
 import { HitDetection } from './HitDetection.js';
 import { InputBuffer } from './InputBuffer.js';
@@ -42,7 +42,7 @@ export class CombatSystem {
   private bowSystem: BowSystem;
   private spellSystem: SpellSystem;
 
-  private combatStates: Map<string, CombatStateComponent> = new Map();
+  private combatStateManager: CombatStateManager;
   private currentTime: number = 0;
 
   constructor(
@@ -60,6 +60,7 @@ export class CombatSystem {
     this.inputBuffer = new InputBuffer();
     this.enemyAI = new EnemyAISystem();
     this.visualFeedback = new VisualFeedback(scene);
+    this.combatStateManager = new CombatStateManager();
 
     this.swordSystem = new SwordSystem(this.damageSystem, this.hitDetection, this.inputBuffer);
     this.bowSystem = new BowSystem(this.damageSystem, this.hitDetection);
@@ -76,16 +77,13 @@ export class CombatSystem {
     const feedback = this.visualFeedback.update(deltaTime);
 
     // Update all combat states
-    for (const [id, state] of this.combatStates.entries()) {
-      state.regenerateStamina(deltaTime);
-      state.decayStagger(deltaTime);
-    }
+    this.combatStateManager.update(deltaTime);
 
     // Update enemy AI
     for (const enemy of this.enemyAI.getAllEnemies()) {
       const enemyPos = this.physicsWorld.getCharacter(enemy.id)?.position;
       const playerPos = this.physicsWorld.getCharacter('player')?.position;
-      const playerState = this.combatStates.get('player');
+      const playerState = this.combatStateManager.getCombatState('player');
 
       if (enemyPos && playerPos && playerState) {
         const enemyPosVec = new THREE.Vector3(enemyPos.x, enemyPos.y, enemyPos.z);
@@ -108,7 +106,7 @@ export class CombatSystem {
 
     // Update weapons
     const playerPos = this.physicsWorld.getCharacter('player')?.position;
-    const playerState = this.combatStates.get('player');
+    const playerState = this.combatStateManager.getCombatState('player');
 
     if (playerPos && playerState) {
       const posVec = new THREE.Vector3(playerPos.x, playerPos.y, playerPos.z);
@@ -155,8 +153,8 @@ export class CombatSystem {
     baseDamage: number,
     damageType: 'physical' | 'fire' | 'frost' | 'magic'
   ): void {
-    const attacker = this.combatStates.get(attackerId);
-    const target = this.combatStates.get(targetId);
+    const attacker = this.combatStateManager.getCombatState(attackerId);
+    const target = this.combatStateManager.getCombatState(targetId);
 
     if (!attacker || !target) return;
 
@@ -219,34 +217,33 @@ export class CombatSystem {
    * Register combatant
    */
   registerCombatant(id: string, maxHealth: number, maxStamina: number, maxStagger: number): void {
-    const state = new CombatStateComponent(maxHealth, maxStamina, maxStagger);
-    this.combatStates.set(id, state);
+    this.combatStateManager.registerCombatant(id, maxHealth, maxStamina, maxStagger);
   }
 
   /**
    * Get combat state
    */
-  getCombatState(id: string): CombatStateComponent | undefined {
-    return this.combatStates.get(id);
+  getCombatState(id: string) {
+    return this.combatStateManager.getCombatState(id);
   }
 
   /**
    * Player actions
    */
   playerLightAttack(): boolean {
-    const state = this.combatStates.get('player');
+    const state = this.combatStateManager.getCombatState('player');
     if (!state) return false;
     return this.swordSystem.lightAttack(state, this.currentTime);
   }
 
   playerHeavyAttack(): boolean {
-    const state = this.combatStates.get('player');
+    const state = this.combatStateManager.getCombatState('player');
     if (!state) return false;
     return this.swordSystem.heavyAttack(state);
   }
 
   playerBlock(start: boolean): void {
-    const state = this.combatStates.get('player');
+    const state = this.combatStateManager.getCombatState('player');
     if (!state) return;
     if (start) {
       this.swordSystem.startBlock(state);
@@ -256,13 +253,13 @@ export class CombatSystem {
   }
 
   playerParry(): boolean {
-    const state = this.combatStates.get('player');
+    const state = this.combatStateManager.getCombatState('player');
     if (!state) return false;
     return this.swordSystem.startParry(state);
   }
 
   playerShootArrow(origin: THREE.Vector3, direction: THREE.Vector3): boolean {
-    const state = this.combatStates.get('player');
+    const state = this.combatStateManager.getCombatState('player');
     if (!state) return false;
     return this.bowSystem.shoot(state, origin, direction);
   }
@@ -325,7 +322,7 @@ export class CombatSystem {
    */
   dispose(): void {
     this.visualFeedback.dispose();
-    this.combatStates.clear();
+    this.combatStateManager.clear();
     this.enemyAI.clear();
   }
 }
