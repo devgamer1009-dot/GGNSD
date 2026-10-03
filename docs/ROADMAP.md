@@ -34,6 +34,6 @@
 
 ## Polish (P19–P21)
 
-- [ ] **P19** — Performance optimization pass
-- [ ] **P20** — Content creation (quests, NPCs, items)
+- [x] **P19** — SLICE integration (game state, quest progression, save/load, audio, basic scene) ✅
+- [ ] **P20** — Performance optimization pass
 - [ ] **P21** — Beta release, bug fixes, balance
