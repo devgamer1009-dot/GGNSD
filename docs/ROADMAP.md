@@ -20,7 +20,7 @@
 
 - [x] **P9** — Player movement (character state machine, Rapier physics, heightfield colliders, third-person camera, lock-on, debug visualization) ✅
 - [x] **P10** — Vegetation system (instanced placement, biome density, LOD + billboards, wind shader, culling, grass, rocks/props) ✅
-- [ ] **P11** — Water bodies (lakes, rivers with flow, buoyancy)
+- [x] **P11** — Character system (GPU skinning, animation state machine, procedural humanoid, horse with gaits, mount/dismount, rider camera, instanced crowds) ✅
 - [ ] **P12** — Structure placement (buildings, ruins, waypoints)
 
 ## Gameplay (P13–P17)

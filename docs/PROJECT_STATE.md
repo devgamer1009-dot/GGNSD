@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P10 — Vegetation** ✅ COMPLETE
+**P11 — Characters** ✅ COMPLETE
 
 ## What Exists
 
@@ -87,6 +87,17 @@
   - Near-field grass system (up to 10k blades per chunk)
   - Rock and prop placement with slope/water exclusion rules
   - Instance budgets per tier (Low/Medium/High)
+- **Character System (P11):**
+  - GPU skinning with 11-bone skeleton
+  - Animation state machine with blending (tied to MOVEMENT.md states)
+  - Procedural low-poly humanoid (fallback when CC0 unavailable)
+  - Animation LOD (full skeleton → reduced → billboard)
+  - Foot IK for ground alignment (nearby characters only)
+  - Horse system with walk/trot/gallop gaits
+  - Mount/dismount system with smooth transitions
+  - Rider camera mode for mounted characters
+  - Instanced crowd system for distant NPCs (up to 100 members)
+  - CC0 asset support (Quaternius, Kenney; NOT Mixamo)
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -135,6 +146,9 @@
 - ✅ Vegetation placement determinism verified (same seed = same output)
 - ✅ Vegetation exclusion rules working (slope, water, spacing)
 - ✅ Vegetation tests pass (determinism, exclusion, biome density)
+- ✅ Animation state machine transitions working
+- ✅ Blend weights sum to 1.0 (verified in tests)
+- ✅ Animation tests pass (transitions, blending, completion)
 
 ## Known Bugs
 
@@ -145,12 +159,12 @@
 
 ## Next Prompt
 
-**P11 — Water Bodies**
-- Lakes and rivers with flow simulation
-- Water surface rendering (reflections, refractions)
-- Buoyancy physics for swimming
-- Water interaction with terrain (erosion, deposition)
-- Integration with environment system (rain → water level)
+**P12 — Structure Placement**
+- Buildings and ruins placement
+- Waypoints and points of interest
+- Interior/exterior transitions
+- Structure collision and interaction
+- Integration with asset pipeline
 
 ## Files Next Session Must Read
 
@@ -165,22 +179,40 @@
 9. `docs/ASSETS.md` (asset pipeline documentation)
 10. `docs/MOVEMENT.md` (player movement documentation)
 11. `docs/VEGETATION.md` (vegetation system documentation)
-12. `docs/design/GAMEPLAY.md`
-13. `src/engine/vegetation/VegetationSystem.ts` (vegetation orchestrator)
-14. `src/engine/vegetation/VegetationProvider.ts` (CellContentProvider)
-15. `src/engine/physics/PhysicsWorld.ts` (physics integration)
-16. `src/engine/physics/CharacterStateMachine.ts` (state machine)
-17. `src/engine/camera/ThirdPersonCamera.ts` (camera system)
-18. `src/engine/assets/manager.ts` (asset manager)
-19. `src/engine/streaming/StreamingManager.ts`
-20. `src/engine/terrain/TerrainSystem.ts`
-21. `src/engine/environment/EnvironmentManager.ts`
-22. `src/engine/render/Renderer.ts`
-23. `src/engine/index.ts`
-24. `tsconfig.json`
-25. `.depcruise.cjs`
+12. `docs/CHARACTERS.md` (character system documentation)
+13. `docs/design/GAMEPLAY.md`
+14. `src/engine/characters/CharacterSystem.ts` (character orchestrator)
+15. `src/engine/characters/AnimationStateMachine.ts` (animation states)
+16. `src/engine/characters/Horse.ts` (horse system)
+17. `src/engine/vegetation/VegetationSystem.ts` (vegetation orchestrator)
+18. `src/engine/vegetation/VegetationProvider.ts` (CellContentProvider)
+19. `src/engine/physics/PhysicsWorld.ts` (physics integration)
+20. `src/engine/physics/CharacterStateMachine.ts` (state machine)
+21. `src/engine/camera/ThirdPersonCamera.ts` (camera system)
+22. `src/engine/assets/manager.ts` (asset manager)
+23. `src/engine/streaming/StreamingManager.ts`
+24. `src/engine/terrain/TerrainSystem.ts`
+25. `src/engine/environment/EnvironmentManager.ts`
+26. `src/engine/render/Renderer.ts`
+27. `src/engine/index.ts`
+28. `tsconfig.json`
+29. `.depcruise.cjs`
 
 ## Session Notes
+
+- **P11 completed** - Character system implemented
+  - GPU skinning with 11-bone skeleton
+  - Animation state machine with blending (tied to MOVEMENT.md states)
+  - Procedural low-poly humanoid (fallback when CC0 unavailable)
+  - Animation LOD (full skeleton → reduced → billboard)
+  - Foot IK for ground alignment (nearby characters only)
+  - Horse system with walk/trot/gallop gaits
+  - Mount/dismount system with smooth transitions
+  - Rider camera mode for mounted characters
+  - Instanced crowd system for distant NPCs (up to 100 members)
+  - CC0 asset support (Quaternius, Kenney; NOT Mixamo)
+  - Character documentation at `docs/CHARACTERS.md`
+  - Animation tests passing (transitions, blending, completion)
 
 - **P10 completed** - Vegetation system implemented
   - Instanced vegetation per cell via CellContentProvider

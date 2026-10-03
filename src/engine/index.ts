@@ -39,3 +39,6 @@ export * from './camera/index.js';
 
 // Vegetation module
 export * from './vegetation/index.js';
+
+// Characters module
+export * from './characters/index.js';
