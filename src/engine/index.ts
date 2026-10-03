@@ -42,3 +42,6 @@ export * from './vegetation/index.js';
 
 // Characters module
 export * from './characters/index.js';
+
+// Combat module
+export * from './combat/index.js';

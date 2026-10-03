@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P11 — Characters** ✅ COMPLETE
+**P12 — Combat** ✅ COMPLETE
 
 ## What Exists
 
@@ -98,6 +98,19 @@
   - Rider camera mode for mounted characters
   - Instanced crowd system for distant NPCs (up to 100 members)
   - CC0 asset support (Quaternius, Kenney; NOT Mixamo)
+- **Combat System (P12):**
+  - Data-driven combat (tuning in src/content/combat/schemas.ts)
+  - Sword + shield (light/heavy attacks, 3-hit combos, block, parry)
+  - Bow (aim, shoot, arrow physics)
+  - 3 spells (fire, frost, ward) with cooldowns
+  - Input buffering for combo chaining
+  - Dodge with i-frames
+  - Stamina system (consumption, regeneration, exhaustion)
+  - Stagger/break meters
+  - Hit detection via sweep tests
+  - Visual feedback (hit-stop, camera shake, GPU particles)
+  - 3 enemy types (swordsman, archer, brute) with telegraphed AI
+  - Schema-validated combat data
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -149,6 +162,11 @@
 - ✅ Animation state machine transitions working
 - ✅ Blend weights sum to 1.0 (verified in tests)
 - ✅ Animation tests pass (transitions, blending, completion)
+- ✅ Combat damage calculations verified
+- ✅ Stamina consumption/regeneration working
+- ✅ Parry timing windows tested
+- ✅ Combo input buffering tested
+- ✅ Combat tests pass (damage, stamina, parry, combos)
 
 ## Known Bugs
 
@@ -159,12 +177,12 @@
 
 ## Next Prompt
 
-**P12 — Structure Placement**
-- Buildings and ruins placement
-- Waypoints and points of interest
-- Interior/exterior transitions
-- Structure collision and interaction
-- Integration with asset pipeline
+**P13 — NPC System**
+- NPC spawning and lifecycle
+- Dialogue system
+- Quest system
+- NPC schedules and routines
+- Integration with combat and movement
 
 ## Files Next Session Must Read
 
@@ -180,7 +198,8 @@
 10. `docs/MOVEMENT.md` (player movement documentation)
 11. `docs/VEGETATION.md` (vegetation system documentation)
 12. `docs/CHARACTERS.md` (character system documentation)
-13. `docs/design/GAMEPLAY.md`
+13. `docs/COMBAT.md` (combat system documentation)
+14. `docs/design/GAMEPLAY.md`
 14. `src/engine/characters/CharacterSystem.ts` (character orchestrator)
 15. `src/engine/characters/AnimationStateMachine.ts` (animation states)
 16. `src/engine/characters/Horse.ts` (horse system)
@@ -199,6 +218,19 @@
 29. `.depcruise.cjs`
 
 ## Session Notes
+
+- **P12 completed** - Combat system implemented
+  - Data-driven combat with schema validation
+  - Sword + shield with 3-hit combos and input buffering
+  - Bow with aiming and arrow physics
+  - 3 spells (fire, frost, ward) with cooldowns
+  - Block and parry system with timing windows
+  - Stamina and stagger systems
+  - Hit detection via sweep tests
+  - Visual feedback (hit-stop, camera shake, particles)
+  - 3 enemy types with telegraphed AI state machines
+  - Combat documentation at `docs/COMBAT.md`
+  - Combat tests passing (damage, stamina, parry, combos)
 
 - **P11 completed** - Character system implemented
   - GPU skinning with 11-bone skeleton

@@ -21,7 +21,8 @@
 - [x] **P9** — Player movement (character state machine, Rapier physics, heightfield colliders, third-person camera, lock-on, debug visualization) ✅
 - [x] **P10** — Vegetation system (instanced placement, biome density, LOD + billboards, wind shader, culling, grass, rocks/props) ✅
 - [x] **P11** — Character system (GPU skinning, animation state machine, procedural humanoid, horse with gaits, mount/dismount, rider camera, instanced crowds) ✅
-- [ ] **P12** — Structure placement (buildings, ruins, waypoints)
+- [x] **P12** — Combat system (sword/shield, bow, spells, combos, block/parry, stamina, stagger, hit detection, enemy AI, visual feedback) ✅
+- [ ] **P13** — NPC system (spawning, dialogue, quests, schedules)
 
 ## Gameplay (P13–P17)
 
