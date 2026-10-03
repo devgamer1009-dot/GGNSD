@@ -27,3 +27,6 @@ export * from './streaming/index.js';
 
 // Environment module
 export * from './environment/index.js';
+
+// Asset module
+export * from './assets/index.js';

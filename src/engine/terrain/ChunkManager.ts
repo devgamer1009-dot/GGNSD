@@ -11,13 +11,13 @@ export interface ChunkKey {
   lod: number;
 }
 
-export interface LODLevel {
+export interface TerrainLODLevel {
   level: number;
   resolution: number;
   maxDistance: number;
 }
 
-export const LOD_LEVELS: LODLevel[] = [
+export const LOD_LEVELS: TerrainLODLevel[] = [
   { level: 0, resolution: 128, maxDistance: 200 },
   { level: 1, resolution: 64, maxDistance: 400 },
   { level: 2, resolution: 32, maxDistance: 800 },
