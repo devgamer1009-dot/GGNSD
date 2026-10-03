@@ -32,8 +32,13 @@
 - [x] **P17** — Audio system (Web Audio API, mixer buses, spatialization, procedural SFX, adaptive music, reverb zones) ✅
 - [x] **P18** — Save/Load system (IndexedDB, migrations, checksums, autosave, export/import, settings) ✅
 
-## Polish (P19–P21)
+## Content (P20–P21)
 
 - [x] **P19** — SLICE integration (game state, quest progression, save/load, audio, basic scene) ✅
-- [ ] **P20** — Performance optimization pass
-- [ ] **P21** — Beta release, bug fixes, balance
+- [x] **P20** — Region: Thornwood (ancient forest, fey village, 6 quests, 2 enemies, 8 landmarks) ✅
+- [ ] **P21** — Region: Ironcrag (mountains, mines, 3 settlements, 6 quests, 2 enemies)
+
+## Polish (P22–P23)
+
+- [ ] **P22** — Performance optimization pass
+- [ ] **P23** — Beta release, bug fixes, balance

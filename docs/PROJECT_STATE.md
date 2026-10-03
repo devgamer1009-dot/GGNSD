@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P19 — SLICE Integration** ✅ COMPLETE
+**P20 — Region: Thornwood** ✅ COMPLETE
 
 ## What Exists
 
@@ -203,6 +203,19 @@
   - Integration of all P1-P18 systems
   - Review documentation at `docs/review/SLICE_REVIEW.md`
   - Ready for human testing
+- **Thornwood Region (P20):**
+  - Complete region data at `src/content/regions/thornwood.ts`
+  - 3 biomes: Deep Forest, Forest Edge, Fey Grove
+  - 8 landmarks with lore and fast travel
+  - 1 settlement: Elmsong (fey village with 4 buildings, 4 NPCs)
+  - 2 enemy variants: Thorn Sprite (level 8), Corrupted Bear (level 10)
+  - 6 quests: 3 main + 3 side
+  - Complete audio set (music, ambience, SFX)
+  - Color grading with time-of-day variations
+  - Weather weights with seasonal modifiers
+  - All validators passing
+  - Review documentation at `docs/review/THORNWOOD_REVIEW.md`
+  - Test coverage at `tests/thornwood.test.ts`
 - Test world: Free camera flying over 4x4km procedural terrain- Stress test page: `/stress-test.html` with scripted fly-through
 
 ## What Is Verified
@@ -302,6 +315,15 @@
 - ✅ Save/load integrated
 - ✅ Audio integrated
 - ✅ All systems wired together
+- ✅ Thornwood region data validated
+- ✅ 8 landmarks with valid positions
+- ✅ Elmsong settlement with 4 buildings and 4 NPCs
+- ✅ 2 enemy variants with spawn locations and loot
+- ✅ 6 quests with objectives and rewards
+- ✅ Audio set complete (music, ambience, SFX)
+- ✅ Color grading with palette and post-processing
+- ✅ Weather weights sum to 1.0
+- ✅ All region tests passing
 
 ## Known Bugs
 
@@ -312,12 +334,13 @@
 
 ## Next Prompt
 
-**P19 — Performance Optimization**
-- Frame time profiling and optimization
-- Memory usage optimization
-- Draw call batching
-- LOD system improvements
-- Asset streaming optimization
+**P21 — Region: Ironcrag**
+- Mountain region with snow and mines
+- 3 settlements: Deepdelve, Frostkeep, Anvilgate
+- 2 enemy variants: Ice Wraith, Mine Horror
+- 6 quests (3 main + 3 side)
+- Industrial atmosphere with dwarven influence
+- Forge-Lord Kaelin boss fight
 
 ## Files Next Session Must Read
 

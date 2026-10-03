@@ -104,14 +104,27 @@ The final product. 20-30 hours.
 
 ## Region Breakdown (Summary)
 
-| Region     | Tier        | Settlements | Quests | Boss              | Dungeon          |
-| ---------- | ----------- | ----------- | ------ | ----------------- | ---------------- |
-| Greenmarch | SLICE+BETA+FULL | 3 | 8 | Blight-Knight | Hollow Barrow |
-| Thornwood  | BETA+FULL   | 2           | 6      | Thornmother       | Rootmaze         |
-| Ironcrag   | BETA+FULL   | 3           | 6      | Forge-Lord Kaelin | Deep Forge       |
-| Saltfen    | FULL        | 3           | 5      | Salt Baron        | Sunken Crypt     |
-| Ashfell    | FULL        | 1           | 5      | Cultist Leader + Dragon | Molten Core |
-| Highspire  | BETA hub, FULL full | — | 5 | — | Shattered Throne |
+| Region     | Tier        | Settlements | Quests | Enemies | Landmarks | Boss              | Dungeon          | Status |
+| ---------- | ----------- | ----------- | ------ | ------- | --------- | ----------------- | ---------------- | ------ |
+| Greenmarch | SLICE+BETA+FULL | 3 | 8 | 3 | 8 | Blight-Knight | Hollow Barrow | ✅ Complete (P19) |
+| Thornwood  | BETA+FULL   | 1 (Elmsong) | 6 (3 main + 3 side) | 2 (Thorn Sprite, Corrupted Bear) | 8 | Thornmother | Rootmaze | ✅ Complete (P20) |
+| Ironcrag   | BETA+FULL   | 3           | 6      | TBD | TBD | Forge-Lord Kaelin | Deep Forge | 🔲 Planned |
+| Saltfen    | FULL        | 3           | 5      | TBD | TBD | Salt Baron        | Sunken Crypt | 🔲 Planned |
+| Ashfell    | FULL        | 1           | 5      | TBD | TBD | Cultist Leader + Dragon | Molten Core | 🔲 Planned |
+| Highspire  | BETA hub, FULL full | — | 5 | TBD | TBD | — | Shattered Throne | 🔲 Planned |
+
+### Content Totals (Completed Regions)
+
+| Category | Greenmarch | Thornwood | Total | BETA Target | Status |
+|----------|------------|-----------|-------|-------------|--------|
+| Regions | 1 | 1 | 2 | 3 | 67% |
+| Settlements | 3 | 1 | 4 | 4 | 100% ✅ |
+| Named NPCs | 12 | 4 | 16 | 40 | 40% |
+| Quests | 8 | 6 | 14 | 15 | 93% |
+| Enemy Types | 3 | 2 | 5 | 6 | 83% |
+| Landmarks | 8 | 8 | 16 | 25 | 64% |
+| Bosses | 1 | 0 | 1 | 3 | 33% |
+| Dungeons | 1 | 0 | 1 | 3 | 33% |
 
 ---
 
