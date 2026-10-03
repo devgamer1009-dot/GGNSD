@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P7 — Environment** ✅ COMPLETE
+**P8 — Asset Pipeline** ✅ COMPLETE
 
 ## What Exists
 
@@ -61,6 +61,15 @@
   - Quality tiers for all subsystems (LOW/MEDIUM/HIGH)
   - Queryable API: getSunDirection(), getWind(x,z,t), getWeatherState()
   - Debug panel with time/weather/quality controls
+- **Asset Pipeline (P8):**
+  - Manifest-driven assets with IDs (no hardcoded paths)
+  - GLTF + Meshopt + KTX2 loaders (verified Three.js r186 APIs)
+  - 13 parametric generators (rocks, trees, houses, walls, props)
+  - Validation system (broken refs, size/triangle budgets)
+  - LOD selection with hysteresis (distance-based)
+  - Versioned cache keys (IndexedDB backend)
+  - Asset gallery page: `/assets/gallery.html`
+  - Sample manifest with all parametric assets
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -99,6 +108,8 @@
 - ✅ Quality tiers: All subsystems support LOW/MEDIUM/HIGH
 - ✅ Debug panel: Time/weather/quality controls
 - ✅ Environment tests pass (time/weather transitions, wind field, region weather)
+- ✅ Asset pipeline tests pass (manifest validation, parametric generators, LOD selection, caching)
+- ✅ Asset gallery page renders all parametric assets with 3D previews
 
 ## Known Bugs
 
@@ -109,7 +120,7 @@
 
 ## Next Prompt
 
-**P8 — Vegetation & Props**
+**P9 — Vegetation & Prop Placement**
 - Tree placement based on biome and slope
 - Grass/ground cover with wind animation
 - Rock placement in mountainous regions
@@ -127,16 +138,35 @@
 6. `docs/TERRAIN.md` (terrain system documentation)
 7. `docs/STREAMING.md` (streaming system documentation)
 8. `docs/ENVIRONMENT.md` (environment system documentation)
-9. `docs/design/GAMEPLAY.md`
-10. `src/engine/streaming/StreamingManager.ts`
-11. `src/engine/terrain/TerrainSystem.ts`
-12. `src/engine/environment/EnvironmentManager.ts`
-13. `src/engine/render/Renderer.ts`
-14. `src/engine/index.ts`
-15. `tsconfig.json`
-16. `.depcruise.cjs`
+9. `docs/ASSETS.md` (asset pipeline documentation)
+10. `docs/design/GAMEPLAY.md`
+11. `src/engine/assets/manager.ts` (asset manager)
+12. `src/engine/streaming/StreamingManager.ts`
+13. `src/engine/terrain/TerrainSystem.ts`
+14. `src/engine/environment/EnvironmentManager.ts`
+15. `src/engine/render/Renderer.ts`
+16. `src/engine/index.ts`
+17. `tsconfig.json`
+18. `.depcruise.cjs`
 
 ## Session Notes
+
+- P8 completed in ~25 tool calls (within 30 budget)
+- Asset pipeline fully implemented with all requested features:
+  - Manifest-driven assets with IDs (no hardcoded paths)
+  - GLTF + Meshopt + KTX2 loaders (verified Three.js r186 APIs)
+  - 13 parametric generators (rocks, trees, houses, walls, props)
+  - Validation system (broken refs, size/triangle budgets)
+  - LOD selection with hysteresis (distance-based)
+  - Versioned cache keys (IndexedDB backend)
+  - Asset gallery page: `/assets/gallery.html`
+  - Sample manifest with all parametric assets
+- Asset pipeline documentation at `docs/ASSETS.md`
+- All asset pipeline tests passing (manifest validation, parametric generators, LOD selection, caching)
+- Gallery page renders all parametric assets with 3D previews
+- Installed meshoptimizer package for compressed glTF support
+- No images used (all procedural generation)
+- No TODO left behind
 
 - P7 completed in ~30 tool calls (within 30 budget)
 - Environment system fully implemented with all requested features:

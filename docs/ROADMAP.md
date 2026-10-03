@@ -14,11 +14,11 @@
 - [x] **P5** — Procedural terrain generation (worker, fBm, ridged, erosion, rivers, biomes, regions, LOD) ✅
 - [x] **P6** — Streaming system (priority queue, worker pool, time-sliced uploads, LRU, IndexedDB cache, CellContentProvider) ✅
 - [x] **P7** — Environment system (24-min day cycle, weather states, sky scattering, Gerstner water, cascaded shadows, rain/snow particles, wind field, quality tiers) ✅
-- [ ] **P8** — Post-processing pipeline (bloom, tonemap, SSAO)
+- [x] **P8** — Asset pipeline (manifest-driven, GLTF+Meshopt+KTX2 loaders, 13 parametric generators, validation, LOD selection, versioned cache, gallery page) ✅
 
 ## World (P9–P12)
 
-- [ ] **P9** — Vegetation system (trees, grass, rocks, CellContentProvider, LOD, instancing)
+- [ ] **P9** — Vegetation & prop placement (biome-based, wind animation, instancing, CellContentProvider)
 - [ ] **P10** — Camera system (perspective, ortho, controls)
 - [ ] **P11** — Water bodies (lakes, rivers with flow)
 - [ ] **P12** — Structure placement (buildings, ruins, waypoints)
