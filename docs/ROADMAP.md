@@ -22,7 +22,8 @@
 - [x] **P10** — Vegetation system (instanced placement, biome density, LOD + billboards, wind shader, culling, grass, rocks/props) ✅
 - [x] **P11** — Character system (GPU skinning, animation state machine, procedural humanoid, horse with gaits, mount/dismount, rider camera, instanced crowds) ✅
 - [x] **P12** — Combat system (sword/shield, bow, spells, combos, block/parry, stamina, stagger, hit detection, enemy AI, visual feedback) ✅
-- [ ] **P13** — NPC system (spawning, dialogue, quests, schedules)
+- [x] **P13** — Settlement system (deterministic generation, road network, plots, 10 building types, terrain flattening, interiors, landmarks) ✅
+- [ ] **P14** — NPC system (spawning, dialogue, quests, schedules)
 
 ## Gameplay (P13–P17)
 

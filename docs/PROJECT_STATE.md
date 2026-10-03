@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P12 — Combat** ✅ COMPLETE
+**P13 — Settlements** ✅ COMPLETE
 
 ## What Exists
 
@@ -111,6 +111,16 @@
   - Visual feedback (hit-stop, camera shake, GPU particles)
   - 3 enemy types (swordsman, archer, brute) with telegraphed AI
   - Schema-validated combat data
+- **Settlement System (P13):**
+  - Deterministic settlement generation (seeded RNG)
+  - Road network (radial main roads + branches)
+  - Plot system (collision-free placement)
+  - 10 building types from modular kit
+  - Terrain flattening under buildings
+  - Interior system (tavern, smithy, church, castle keep)
+  - Authored landmarks (Highspire castle, Briarhollow village)
+  - Integration with streaming via CellContentProvider
+  - Schema-validated settlement data
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -167,6 +177,10 @@
 - ✅ Parry timing windows tested
 - ✅ Combo input buffering tested
 - ✅ Combat tests pass (damage, stamina, parry, combos)
+- ✅ Settlement generation deterministic (same seed = same layout)
+- ✅ No overlapping plots (collision detection)
+- ✅ Slope limit validation working
+- ✅ Settlement tests pass (determinism, validation, meshes)
 
 ## Known Bugs
 
@@ -177,7 +191,7 @@
 
 ## Next Prompt
 
-**P13 — NPC System**
+**P14 — NPC System**
 - NPC spawning and lifecycle
 - Dialogue system
 - Quest system
@@ -199,7 +213,8 @@
 11. `docs/VEGETATION.md` (vegetation system documentation)
 12. `docs/CHARACTERS.md` (character system documentation)
 13. `docs/COMBAT.md` (combat system documentation)
-14. `docs/design/GAMEPLAY.md`
+14. `docs/SETTLEMENTS.md` (settlement system documentation)
+15. `docs/design/GAMEPLAY.md`
 14. `src/engine/characters/CharacterSystem.ts` (character orchestrator)
 15. `src/engine/characters/AnimationStateMachine.ts` (animation states)
 16. `src/engine/characters/Horse.ts` (horse system)
@@ -218,6 +233,18 @@
 29. `.depcruise.cjs`
 
 ## Session Notes
+
+- **P13 completed** - Settlement system implemented
+  - Deterministic settlement generation with seeded RNG
+  - Road network (radial main roads + branches)
+  - Plot system with collision-free placement
+  - 10 building types from modular kit
+  - Terrain flattening under buildings with smooth blend zones
+  - Interior system (tavern, smithy, church, castle keep)
+  - Authored landmarks (Highspire castle, Briarhollow village)
+  - Integration with streaming via CellContentProvider
+  - Settlement documentation at `docs/SETTLEMENTS.md`
+  - Settlement tests passing (determinism, validation, meshes)
 
 - **P12 completed** - Combat system implemented
   - Data-driven combat with schema validation

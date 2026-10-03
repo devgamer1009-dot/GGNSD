@@ -45,3 +45,6 @@ export * from './characters/index.js';
 
 // Combat module
 export * from './combat/index.js';
+
+// Settlements module
+export * from './settlements/index.js';
