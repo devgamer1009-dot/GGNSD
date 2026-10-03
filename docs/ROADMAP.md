@@ -13,15 +13,15 @@
 
 - [x] **P5** — Procedural terrain generation (worker, fBm, ridged, erosion, rivers, biomes, regions, LOD) ✅
 - [x] **P6** — Streaming system (priority queue, worker pool, time-sliced uploads, LRU, IndexedDB cache, CellContentProvider) ✅
-- [ ] **P7** — Advanced lighting (directional, ambient, shadows)
-- [ ] **P8** — Post-processing pipeline (bloom, tonemap)
+- [x] **P7** — Environment system (24-min day cycle, weather states, sky scattering, Gerstner water, cascaded shadows, rain/snow particles, wind field, quality tiers) ✅
+- [ ] **P8** — Post-processing pipeline (bloom, tonemap, SSAO)
 
 ## World (P9–P12)
 
-- [ ] **P9** — Camera system (perspective, ortho, controls)
-- [ ] **P10** — Day/night cycle
-- [ ] **P11** — Weather system (rain, snow, fog)
-- [ ] **P12** — Vegetation system (trees, grass, CellContentProvider)
+- [ ] **P9** — Vegetation system (trees, grass, rocks, CellContentProvider, LOD, instancing)
+- [ ] **P10** — Camera system (perspective, ortho, controls)
+- [ ] **P11** — Water bodies (lakes, rivers with flow)
+- [ ] **P12** — Structure placement (buildings, ruins, waypoints)
 
 ## Gameplay (P13–P17)
 

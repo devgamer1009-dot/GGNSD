@@ -4,7 +4,7 @@
 
 ## Current Phase
 
-**P6 — Streaming** ✅ COMPLETE
+**P7 — Environment** ✅ COMPLETE
 
 ## What Exists
 
@@ -48,6 +48,19 @@
   - CellContentProvider interface for vegetation/NPCs/settlements
   - Floating-origin rebasing for precision
   - Complete dispose of all resources
+- **Environment System (P7):**
+  - 24-minute day cycle with sun/moon positions
+  - Weather states: CLEAR, OVERCAST, RAIN, STORM, FOG, SNOW
+  - Smooth weather transitions with parameter interpolation
+  - Sky system with atmospheric scattering and procedural clouds
+  - Water system with Gerstner waves, depth color, foam, sky reflection
+  - Stabilized cascaded shadow maps (2-4 cascades)
+  - Particle system for rain and snow
+  - Shared wind field affecting all systems
+  - Region-specific weather (Ironcrag snow)
+  - Quality tiers for all subsystems (LOW/MEDIUM/HIGH)
+  - Queryable API: getSunDirection(), getWind(x,z,t), getWeatherState()
+  - Debug panel with time/weather/quality controls
 - Test world: Free camera flying over 4x4km procedural terrain
 - Stress test page: `/stress-test.html` with scripted fly-through
 
@@ -75,6 +88,17 @@
 - ✅ Web Worker terrain generation (zero-copy transfer)
 - ✅ LOD system with 4 levels
 - ✅ Free camera controls (WASD + mouse look)
+- ✅ Environment system integrated with streaming
+- ✅ Time system: 24-minute day cycle, day phases, sun/moon positions
+- ✅ Weather system: 6 states, smooth transitions, region-specific weather
+- ✅ Wind field: Shared across all systems, position/time-dependent
+- ✅ Sky system: Atmospheric scattering, procedural clouds, fog
+- ✅ Water system: Gerstner waves, depth color, foam, sky reflection
+- ✅ Shadow system: Stabilized cascaded shadows (2-4 cascades)
+- ✅ Particle system: Rain and snow with wind influence
+- ✅ Quality tiers: All subsystems support LOW/MEDIUM/HIGH
+- ✅ Debug panel: Time/weather/quality controls
+- ✅ Environment tests pass (time/weather transitions, wind field, region weather)
 
 ## Known Bugs
 
@@ -85,12 +109,13 @@
 
 ## Next Prompt
 
-**P7 — Advanced Lighting & Shadows**
-- Directional light with cascaded shadow maps
-- Ambient occlusion (screen-space or baked)
-- Dynamic time-of-day system
-- Fog (distance + height-based)
-- Light probes for indoor areas
+**P8 — Vegetation & Props**
+- Tree placement based on biome and slope
+- Grass/ground cover with wind animation
+- Rock placement in mountainous regions
+- LOD system for vegetation (billboard impostors)
+- Integration with CellContentProvider
+- Performance: instanced rendering, frustum culling
 
 ## Files Next Session Must Read
 
@@ -98,35 +123,39 @@
 2. `docs/ARCHITECTURE.md`
 3. `docs/CONVENTIONS.md`
 4. `docs/PERFORMANCE.md`
-5. `docs/DECISIONS.md` (ADR-006: renderer, ADR-007: ECS, ADR-008: chunk size)
+5. `docs/DECISIONS.md` (ADR-006: renderer, ADR-007: ECS, ADR-008: chunk size, ADR-009: streaming)
 6. `docs/TERRAIN.md` (terrain system documentation)
 7. `docs/STREAMING.md` (streaming system documentation)
-8. `docs/design/GAMEPLAY.md`
-9. `src/engine/streaming/StreamingManager.ts`
-10. `src/engine/terrain/TerrainSystem.ts`
-11. `src/engine/render/Renderer.ts`
-12. `src/engine/index.ts`
-13. `tsconfig.json`
-14. `.depcruise.cjs`
+8. `docs/ENVIRONMENT.md` (environment system documentation)
+9. `docs/design/GAMEPLAY.md`
+10. `src/engine/streaming/StreamingManager.ts`
+11. `src/engine/terrain/TerrainSystem.ts`
+12. `src/engine/environment/EnvironmentManager.ts`
+13. `src/engine/render/Renderer.ts`
+14. `src/engine/index.ts`
+15. `tsconfig.json`
+16. `.depcruise.cjs`
 
 ## Session Notes
 
-- P6 completed in ~28 tool calls (within 30 budget)
-- Streaming system fully implemented with all requested features:
-  - Player-centered rings (full: 400m, near: 800m, far: 1600m, unloaded: 2400m)
-  - Priority queue by distance and velocity
-  - Worker pool (4 workers) with task cancellation
-  - Time-sliced GPU uploads (2 chunks per frame)
-  - LRU eviction (max 100 chunks)
-  - IndexedDB cache (7-day expiration)
-  - CellContentProvider interface for vegetation/NPCs/settlements
-  - Floating-origin rebasing for precision
-  - Complete dispose of all resources
-- Stress test page created at `/stress-test.html`
-- Streaming documentation at `docs/STREAMING.md`
-- All streaming tests passing (priority queue ordering, dispose cleanup)
-- Updated worker to support task-based interface with cancellation
-- App.tsx updated to use StreamingManager instead of TerrainSystem
+- P7 completed in ~30 tool calls (within 30 budget)
+- Environment system fully implemented with all requested features:
+  - 24-minute day cycle with sun/moon positions
+  - 6 weather states: CLEAR, OVERCAST, RAIN, STORM, FOG, SNOW
+  - Smooth weather transitions with parameter interpolation
+  - Sky system with atmospheric scattering and procedural clouds
+  - Water system with Gerstner waves, depth color, foam, sky reflection
+  - Stabilized cascaded shadow maps (2-4 cascades based on quality)
+  - Particle system for rain and snow with wind influence
+  - Shared wind field affecting all systems
+  - Region-specific weather (Ironcrag snow)
+  - Quality tiers for all subsystems (LOW/MEDIUM/HIGH)
+  - Queryable API: getSunDirection(), getWind(x,z,t), getWeatherState()
+  - Debug panel with time/weather/quality controls
+- Environment documentation at `docs/ENVIRONMENT.md`
+- All environment tests passing (time/weather transitions, wind field, region weather)
+- App.tsx updated to integrate EnvironmentManager
+- Removed manual lighting setup (environment system handles it)
 - No images used (all procedural generation)
 - No TODO left behind
 - Renderer: Three.js WebGPURenderer with automatic WebGL2 fallback

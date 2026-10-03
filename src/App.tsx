@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Renderer, DebugOverlay } from './engine/render/index.js';
 import { StreamingManager, type CellContentProvider } from './engine/streaming/index.js';
+import { EnvironmentManager, EnvironmentDebugPanel } from './engine/environment/index.js';
 import type { TerrainChunkData } from './engine/terrain/index.js';
 import * as THREE from 'three/webgpu';
 
@@ -14,6 +15,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [backend, setBackend] = useState<string>('Initializing...');
   const [stats, setStats] = useState({ loadedChunks: 0, pendingRequests: 0, busyWorkers: 0 });
+  const [environment, setEnvironment] = useState<EnvironmentManager | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -22,6 +24,7 @@ export default function App() {
     let renderer: Renderer | null = null;
     let debugOverlay: DebugOverlay | null = null;
     let streamingManager: StreamingManager | null = null;
+    let environmentManager: EnvironmentManager | null = null;
 
     const init = async () => {
       try {
@@ -49,7 +52,6 @@ export default function App() {
         // Create scene
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x87ceeb);
-        scene.fog = new THREE.Fog(0x87ceeb, 500, 2000);
 
         // Camera
         const camera = new THREE.PerspectiveCamera(
@@ -60,14 +62,9 @@ export default function App() {
         );
         camera.position.set(0, 100, 0);
 
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-        scene.add(ambientLight);
-
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        directionalLight.position.set(500, 1000, 500);
-        directionalLight.castShadow = true;
-        scene.add(directionalLight);
+        // Initialize environment system
+        environmentManager = new EnvironmentManager(scene);
+        setEnvironment(environmentManager);
 
         // Initialize streaming system
         streamingManager = new StreamingManager(
@@ -165,6 +162,9 @@ export default function App() {
 
           camera.position.add(cameraVelocity);
           camera.rotation.set(pitch, yaw, 0, 'YXZ');
+
+          // Update environment
+          environmentManager!.update(dt, camera.position);
 
           // Update streaming
           streamingManager!.update(camera.position.x, camera.position.z);
@@ -273,6 +273,7 @@ export default function App() {
     return () => {
       debugOverlay?.dispose();
       streamingManager?.dispose();
+      environmentManager?.dispose();
       renderer?.dispose();
     };
   }, []);
@@ -312,7 +313,7 @@ export default function App() {
         borderRadius: '4px',
         lineHeight: '1.6',
       }}>
-        <div><strong>CrownFall P6 — Streaming</strong></div>
+        <div><strong>CrownFall P7 — Environment</strong></div>
         <div>Backend: {backend}</div>
         <div>Loaded Chunks: {stats.loadedChunks}</div>
         <div>Pending: {stats.pendingRequests}</div>
@@ -325,6 +326,7 @@ export default function App() {
           <div>F3 — Debug overlay</div>
         </div>
       </div>
+      {environment && <EnvironmentDebugPanel environment={environment} />}
     </div>
   );
 }
